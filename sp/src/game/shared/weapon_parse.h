@@ -125,6 +125,8 @@ public:
 	char					szDroppedModel[MAX_WEAPON_STRING];		// Model of this weapon when dropped on the ground
 
 	bool					m_bUsesHands;
+#ifdef CSS_WEAPONS_IN_HL2 // This code originates from Mapbase v7.0. In the event of a merge conflict, it should take precedence over this code.
+	float					m_flViewmodelFOV;
 #endif
 
 // CLIENT DLL
