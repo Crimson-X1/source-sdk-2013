@@ -43,10 +43,6 @@ protected:
 
 	virtual void PaintNumbers(vgui::HFont font, int xpos, int ypos, int value);
 
-#ifdef MAPBASE
-	virtual bool UsesUniqueSecondaryColor() const { return false; }
-#endif
-
 protected:
 
 	int m_iValue;
