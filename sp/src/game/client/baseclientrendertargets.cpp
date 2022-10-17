@@ -38,7 +38,7 @@ ITexture* CBaseClientRenderTargets::CreateCameraTexture( IMaterialSystem* pMater
 {
 	return pMaterialSystem->CreateNamedRenderTargetTextureEx2(
 		"_rt_Camera",
-		iSize, iSize, RT_SIZE_DEFAULT,
+		512, 512, RT_SIZE_DEFAULT,
 		pMaterialSystem->GetBackBufferFormat(),
 		MATERIAL_RT_DEPTH_SHARED, 
 		0,
