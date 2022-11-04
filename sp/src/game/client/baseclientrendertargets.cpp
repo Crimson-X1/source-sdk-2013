@@ -59,7 +59,8 @@ void CBaseClientRenderTargets::InitClientRenderTargets( IMaterialSystem* pMateri
 	m_WaterRefractionTexture.Init( CreateWaterRefractionTexture( pMaterialSystem, iWaterTextureSize ) );
 
 	// Monitors
-	m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, iCameraTextureSize ) );
+	//m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, 512 ) );
+	m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, 512 ) );
 }
 
 //-----------------------------------------------------------------------------

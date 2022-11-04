@@ -412,7 +412,7 @@ public:
 
 				m_CameraTextures[iRefIndex].Init( g_pMaterialSystem->CreateNamedRenderTargetTextureEx2(
 					szName,
-					256, 256, RT_SIZE_DEFAULT,
+					512, 512, RT_SIZE_DEFAULT,
 					g_pMaterialSystem->GetBackBufferFormat(),
 					MATERIAL_RT_DEPTH_SHARED,
 					0,
