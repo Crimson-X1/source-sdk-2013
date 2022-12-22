@@ -48,6 +48,11 @@ BEGIN_DATADESC( CBaseButton )
 	
 	DEFINE_KEYFIELD( m_sounds, FIELD_INTEGER, "sounds" ),
 	
+	#ifdef MAPBASE
+	DEFINE_KEYFIELD(m_customSound, FIELD_SOUNDNAME, "customSound"),
+	#endif
+
+	
 //	DEFINE_FIELD( m_ls, FIELD_SOUNDNAME ),   // This is restored in Precache()
 //  DEFINE_FIELD( m_nState, FIELD_INTEGER ),
 
@@ -367,6 +372,14 @@ void CBaseButton::Spawn( )
 		m_sNoise = MakeButtonSound( m_sounds );
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
+#ifdef MAPBASE
+	else if (m_sounds == 99)
+	{
+		// Really hope this code will work 
+		m_sNoise = m_customSound
+			; PrecacheScriptSound(m_sNoise.ToCStr());
+	}
+#endif
 	else
 	{
 		m_sNoise = NULL_STRING;
@@ -837,17 +850,25 @@ int CBaseButton::DrawDebugTextOverlays()
 LINK_ENTITY_TO_CLASS( func_rot_button, CRotButton );
 
 
-void CRotButton::Spawn( void )
+void CRotButton::Spawn(void)
 {
 	//----------------------------------------------------
 	//determine sounds for buttons
 	//a sound of 0 should not make a sound
 	//----------------------------------------------------
-	if ( m_sounds )
+	if (m_sounds)
 	{
-		m_sNoise = MakeButtonSound( m_sounds );
+;		m_sNoise = MakeButtonSound(m_sounds);
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
+	#ifdef MAPBASE
+	else if (m_sounds == 99)
+	{
+		// Really hope this code will work 
+		m_sNoise = m_customSound
+			; PrecacheScriptSound(m_sNoise.ToCStr());
+	}
+	#endif
 	else
 	{
 		m_sNoise = NULL_STRING;

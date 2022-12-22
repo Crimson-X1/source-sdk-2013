@@ -78,6 +78,11 @@ protected:
 
 	string_t	m_sNoise;			// The actual WAV file name of the sound.
 
+#ifdef MAPBASE
+
+	string_t	m_customSound;			// Custom .wav file that was defined in the associated keyvalue
+#endif
+
 	COutputEvent m_OnDamaged;
 	COutputEvent m_OnPressed;
 	COutputEvent m_OnUseLocked;
