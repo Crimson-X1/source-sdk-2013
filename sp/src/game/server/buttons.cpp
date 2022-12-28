@@ -372,14 +372,13 @@ void CBaseButton::Spawn( )
 		m_sNoise = MakeButtonSound( m_sounds );
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
-#ifdef MAPBASE
-	else if (m_sounds == 99)
+	#ifdef MAPBASE
+	else if (m_sounds == -1)
 	{
 		// Really hope this code will work 
-		m_sNoise = m_customSound
-			; PrecacheScriptSound(m_sNoise.ToCStr());
+		m_sNoise = m_customSound;
 	}
-#endif
+	#endif
 	else
 	{
 		m_sNoise = NULL_STRING;
@@ -862,11 +861,10 @@ void CRotButton::Spawn(void)
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
 	#ifdef MAPBASE
-	else if (m_sounds == 99)
+	else if (m_sounds == -1)
 	{
 		// Really hope this code will work 
-		m_sNoise = m_customSound
-			; PrecacheScriptSound(m_sNoise.ToCStr());
+		m_sNoise = m_customSound;
 	}
 	#endif
 	else
@@ -1060,6 +1058,13 @@ void CMomentaryRotButton::Spawn( void )
 			m_sNoise = MakeButtonSound( m_sounds );
 			PrecacheScriptSound(m_sNoise.ToCStr());
 		}
+		#ifdef MAPBASE
+		else if (m_sounds == -1)
+		{
+			// Really hope this code will work 
+			m_sNoise = m_customSound;
+		}
+		#endif
 		else
 		{
 			m_sNoise = NULL_STRING;
