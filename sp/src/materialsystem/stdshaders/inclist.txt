@@ -29,3 +29,5 @@ fxctmp9_tmp\SDK_teeth_flashlight_ps30.inc
 fxctmp9_tmp\SDK_teeth_flashlight_vs30.inc
 fxctmp9_tmp\SDK_decalmodulate_ps30.inc
 fxctmp9_tmp\SDK_decalmodulate_vs30.inc
+fxctmp9_tmp\pbr_ps30.inc
+fxctmp9_tmp\pbr_vs30.inc
