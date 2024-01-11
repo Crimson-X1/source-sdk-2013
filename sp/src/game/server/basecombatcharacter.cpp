@@ -175,6 +175,7 @@ BEGIN_ENT_SCRIPTDESC( CBaseCombatCharacter, CBaseFlex, "The base class shared by
 	DEFINE_SCRIPTFUNC_NAMED( ScriptRelationType, "GetRelationship", "Get a character's relationship to a specific entity." )
 	DEFINE_SCRIPTFUNC_NAMED( ScriptRelationPriority, "GetRelationPriority", "Get a character's relationship priority for a specific entity." )
 	DEFINE_SCRIPTFUNC_NAMED( ScriptSetRelationship, "SetRelationship", "Set a character's relationship with a specific entity." )
+	DEFINE_SCRIPTFUNC_NAMED( ScriptSetClassRelationship, "SetClassRelationship", "Set a character's relationship with a specific Classify() class." )
 
 	DEFINE_SCRIPTFUNC_NAMED( ScriptGetVehicleEntity, "GetVehicleEntity", "Get the entity for a character's current vehicle if they're in one." )
 
@@ -3487,7 +3488,7 @@ void CBaseCombatCharacter::AddRelationship( const char *pszRelationship, CBaseEn
 				}
 				else
 				{
-#ifdef MAPBASE // I know the extra #ifdef is pointless, but it's there so you know this is new
+					// NEW: Classify class relationships
 					if (!Q_strnicmp(entityString, "CLASS_", 5))
 					{
 						// Go through all of the classes and find which one this is
@@ -3508,8 +3509,7 @@ void CBaseCombatCharacter::AddRelationship( const char *pszRelationship, CBaseEn
 					}
 					
 					if (!bFoundEntity)
-#endif
-					DevWarning( "Couldn't set relationship to unknown entity or class (%s)!\n", entityString );
+						DevWarning( "Couldn't set relationship to unknown entity or class (%s)!\n", entityString );
 				}
 			}
 		}
@@ -3615,7 +3615,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 	else if (hl2_episodic.GetBool() && !GetActiveWeapon())
 	{
 		// Unarmed citizens are conservative in their weapon finding...in Episode One
-		if (Classify() != CLASS_PLAYER_ALLY_VITAL && Q_strncmp(STRING(gpGlobals->mapname), "ep1_", 4))
+		if (Classify() != CLASS_PLAYER_ALLY_VITAL && Q_strncmp(STRING(gpGlobals->mapname), "ep1_", 4) == 0)
 			bConservative = true;
 	}
 #endif
@@ -4662,6 +4662,13 @@ int CBaseCombatCharacter::ScriptRelationPriority( HSCRIPT pTarget )
 void CBaseCombatCharacter::ScriptSetRelationship( HSCRIPT pTarget, int disposition, int priority )
 {
 	AddEntityRelationship( ToEnt( pTarget ), (Disposition_t)disposition, priority );
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void CBaseCombatCharacter::ScriptSetClassRelationship( int classify, int disposition, int priority )
+{
+	AddClassRelationship( (Class_T)classify, (Disposition_t)disposition, priority);
 }
 
 //-----------------------------------------------------------------------------
