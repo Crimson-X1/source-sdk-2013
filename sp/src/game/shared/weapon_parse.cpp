@@ -410,6 +410,11 @@ FileWeaponInfo_t::FileWeaponInfo_t()
 	m_bUsesHands = false;
 	m_nWeaponRestriction = WPNRESTRICT_NONE;
 #endif
+
+#ifdef EZ2
+	m_bAlwaysFirstDraw = (pKeyValuesData->GetInt( "AlwaysFirstDraw", 0 ) != 0) ? true : false;
+	m_bPreventPlayerSwap = (pKeyValuesData->GetInt( "PreventPlayerSwap", 0 ) != 0) ? true : false;
+#endif
 }
 
 #ifdef CLIENT_DLL

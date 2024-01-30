@@ -140,6 +140,11 @@ public:
 	int						m_nWeaponRestriction;
 #endif
 
+#ifdef EZ2
+	bool					m_bAlwaysFirstDraw;			// This weapon defaults to playing the first draw animation, even if dropped by an enemy 
+	bool					m_bPreventPlayerSwap;		// If the player is holding another weapon in the same slot as this weapon, prevent picking up this weapon 
+#endif
+
 // CLIENT DLL
 	// Sprite data, read from the data file
 	int						iSpriteCount;
