@@ -2696,7 +2696,7 @@ typedef enum
 	ACT_HL2MP_JUMP_USE_HEAVY,
 #endif
 
-#ifdef EZ2
+#ifdef MAPBASE
 	// New viewmodel animations
 	ACT_VM_FIRSTDRAW,
 	ACT_VM_FIRSTDRAW_EMPTY,

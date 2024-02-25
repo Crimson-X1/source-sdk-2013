@@ -140,9 +140,10 @@ public:
 	int						m_nWeaponRestriction;
 #endif
 
-#ifdef EZ2
+#ifdef CRIMSON_MOD
 	bool					m_bAlwaysFirstDraw;			// This weapon defaults to playing the first draw animation, even if dropped by an enemy 
 	bool					m_bPreventPlayerSwap;		// If the player is holding another weapon in the same slot as this weapon, prevent picking up this weapon 
+	char					szWorldModel2[MAX_WEAPON_STRING];		// Secondary world model
 #endif
 
 // CLIENT DLL

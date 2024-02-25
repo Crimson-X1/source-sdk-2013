@@ -400,7 +400,7 @@ public:
 	const FileWeaponInfo_t	&GetWpnData( void ) const;
 	virtual const char		*GetViewModel( int viewmodelindex = 0 ) const;
 	virtual const char		*GetWorldModel( void ) const;
-#ifdef EZ2
+#ifdef MAPBASE
 	virtual const char		*GetSecondaryWorldModel(void) const; // 1upD - adding secondary worldmodel for hopwire grenade
 #endif
 	virtual const char		*GetAnimPrefix( void ) const;
@@ -732,11 +732,11 @@ public:
 	float					m_fFireDuration;		// The amount of time that the weapon has sustained firing
 	int						m_iSubType;
 
-#ifdef EZ2
+#ifdef MAPBASE
 	bool					m_bShouldFirstDraw;
 #endif
 
-#ifdef EZ2 //EZ2
+#ifdef MAPBASE //EZ2
 	bool					m_bFirstDraw;
 #endif
 

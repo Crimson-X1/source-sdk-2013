@@ -149,6 +149,11 @@ public:
 	
 	bool		ShouldLoopMoveSound( void ) { return m_bLoopMoveSound; }
 	bool		m_bLoopMoveSound;			// Move sound loops until stopped
+	
+#ifdef CRIMSON_MOD // #ifdef EZ
+	// Doors NEVER get displaced
+	virtual bool	IsDisplacementImpossible() { return true; }
+#endif	
 
 private:
 	void ChainUse( void );	///< Chains +use on through to m_ChainTarget
