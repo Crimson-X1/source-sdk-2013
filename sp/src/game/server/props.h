@@ -324,6 +324,11 @@ public:
 	// breakable prop
 	virtual IPhysicsObject *GetRootPhysicsObjectForBreak();
 
+#ifdef CRIMSON_MOD // #ifdef EZ
+	// Non-physics props NEVER get dispalced
+	virtual bool	IsDisplacementImpossible() { return true; }
+#endif
+
 	// IPositionWatcher
 	virtual void NotifyPositionChanged( CBaseEntity *pEntity );
 

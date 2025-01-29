@@ -400,6 +400,9 @@ public:
 	const FileWeaponInfo_t	&GetWpnData( void ) const;
 	virtual const char		*GetViewModel( int viewmodelindex = 0 ) const;
 	virtual const char		*GetWorldModel( void ) const;
+#ifdef MAPBASE
+	virtual const char		*GetSecondaryWorldModel(void) const; // 1upD - adding secondary worldmodel for hopwire grenade
+#endif
 	virtual const char		*GetAnimPrefix( void ) const;
 	virtual int				GetMaxClip1( void ) const;
 	virtual int				GetMaxClip2( void ) const;
@@ -728,6 +731,14 @@ public:
 	bool					m_bReloadsSingly;		// True if this weapon reloads 1 round at a time
 	float					m_fFireDuration;		// The amount of time that the weapon has sustained firing
 	int						m_iSubType;
+
+#ifdef MAPBASE
+	bool					m_bShouldFirstDraw;
+#endif
+
+#ifdef MAPBASE //EZ2
+	bool					m_bFirstDraw;
+#endif
 
 	float					m_flUnlockTime;
 	EHANDLE					m_hLocker;				// Who locked this weapon.

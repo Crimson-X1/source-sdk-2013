@@ -78,6 +78,12 @@ protected:
 
 	string_t	m_sNoise;			// The actual WAV file name of the sound.
 
+	#ifdef MAPBASE
+	string_t	m_iszPressedSound;
+	string_t	m_iszLockedSound;
+	string_t	m_iszUnlockedSound;
+	#endif
+
 	COutputEvent m_OnDamaged;
 	COutputEvent m_OnPressed;
 	COutputEvent m_OnUseLocked;

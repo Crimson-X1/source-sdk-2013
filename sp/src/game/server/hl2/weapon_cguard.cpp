@@ -133,23 +133,24 @@ public:
 		//Create a concussive explosion
 		CPASFilter filter( GetAbsOrigin() );
 
+#ifndef CRIMSON_MOD
 		Vector vecForward;
-		AngleVectors( GetAbsAngles(), &vecForward );
-		TE_ConcussiveExplosion( filter, 0.0,
+		AngleVectors(GetAbsAngles(), &vecForward);
+		TE_ConcussiveExplosion(filter, 0.0,
 			&GetAbsOrigin(),//position
 			1.0f,	//scale
-			256*magnitude,	//radius
-			175*magnitude,	//magnitude
-			&vecForward );	//normal
-		
-		int	colorRamp = random->RandomInt( 128, 255 );
+			256 * magnitude,	//radius
+			175 * magnitude,	//magnitude
+			&vecForward);	//normal
+
+		int	colorRamp = random->RandomInt(128, 255);
 
 		//Shockring
 		CBroadcastRecipientFilter filter2;
-		te->BeamRingPoint( filter2, 0, 
+		te->BeamRingPoint(filter2, 0,
 			GetAbsOrigin(),	//origin
 			16,			//start radius
-			300*magnitude,		//end radius
+			300 * magnitude,		//end radius
 			m_spriteTexture, //texture
 			0,			//halo index
 			0,			//start frame
@@ -164,6 +165,8 @@ public:
 			24,			//a
 			128			//speed
 			);
+#endif
+
 
 		//Do the radius damage
 #ifdef MAPBASE

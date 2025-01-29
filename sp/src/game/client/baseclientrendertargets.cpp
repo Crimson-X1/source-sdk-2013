@@ -38,7 +38,7 @@ ITexture* CBaseClientRenderTargets::CreateCameraTexture( IMaterialSystem* pMater
 {
 	return pMaterialSystem->CreateNamedRenderTargetTextureEx2(
 		"_rt_Camera",
-		iSize, iSize, RT_SIZE_DEFAULT,
+		512, 512, RT_SIZE_DEFAULT,
 		pMaterialSystem->GetBackBufferFormat(),
 		MATERIAL_RT_DEPTH_SHARED, 
 		0,
@@ -59,7 +59,8 @@ void CBaseClientRenderTargets::InitClientRenderTargets( IMaterialSystem* pMateri
 	m_WaterRefractionTexture.Init( CreateWaterRefractionTexture( pMaterialSystem, iWaterTextureSize ) );
 
 	// Monitors
-	m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, iCameraTextureSize ) );
+	//m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, 512 ) );
+	m_CameraTexture.Init( CreateCameraTexture( pMaterialSystem, 512 ) );
 }
 
 //-----------------------------------------------------------------------------

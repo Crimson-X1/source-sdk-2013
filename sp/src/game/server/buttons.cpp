@@ -23,6 +23,9 @@ string_t MakeButtonSound( int sound );				// get string of button sound number
 
 #define SF_BUTTON_DONTMOVE				1
 #define SF_ROTBUTTON_NOTSOLID			1
+#ifdef MAPBASE
+	#define SF_BUTTON_NOTSOLID			4		// button will not collide with player
+#endif
 #define	SF_BUTTON_TOGGLE				32		// button stays pushed until reactivated
 #define SF_BUTTON_TOUCH_ACTIVATES		256		// Button fires when touched.
 #define SF_BUTTON_DAMAGE_ACTIVATES		512		// Button fires when damaged.
@@ -47,6 +50,13 @@ BEGIN_DATADESC( CBaseButton )
 	DEFINE_FIELD( m_bSolidBsp, FIELD_BOOLEAN ),
 	
 	DEFINE_KEYFIELD( m_sounds, FIELD_INTEGER, "sounds" ),
+	
+	#ifdef MAPBASE
+	DEFINE_KEYFIELD(m_iszPressedSound, FIELD_STRING, "PressedSound"),
+	DEFINE_KEYFIELD(m_iszLockedSound, FIELD_STRING, "LockedSound"),
+	DEFINE_KEYFIELD(m_iszLockedSound, FIELD_STRING, "UnlockedSound"),
+	#endif
+
 	
 //	DEFINE_FIELD( m_ls, FIELD_SOUNDNAME ),   // This is restored in Precache()
 //  DEFINE_FIELD( m_nState, FIELD_INTEGER ),
@@ -82,16 +92,30 @@ LINK_ENTITY_TO_CLASS( func_button, CBaseButton );
 
 void CBaseButton::Precache( void )
 {
+#ifdef MAPBASE
+	if (m_iszPressedSound != NULL_STRING)
+	{
+		PrecacheScriptSound(STRING(m_iszPressedSound));
+	}
+	if (m_iszLockedSound != NULL_STRING)
+	{
+		PrecacheScriptSound(STRING(m_iszLockedSound));
+	}
+	if (m_iszUnlockedSound != NULL_STRING)
+	{
+		PrecacheScriptSound(STRING(m_iszUnlockedSound));
+	}
+#else 
 	// get door button sounds, for doors which require buttons to open
 	if (m_bLockedSound)
 	{
-		m_ls.sLockedSound = MakeButtonSound( (int)m_bLockedSound );
+		m_ls.sLockedSound = MakeButtonSound((int)m_bLockedSound);
 		PrecacheScriptSound(m_ls.sLockedSound.ToCStr());
 	}
 
 	if (m_bUnlockedSound)
 	{
-		m_ls.sUnlockedSound = MakeButtonSound( (int)m_bUnlockedSound );
+		m_ls.sUnlockedSound = MakeButtonSound((int)m_bUnlockedSound);
 		PrecacheScriptSound(m_ls.sUnlockedSound.ToCStr());
 	}
 
@@ -99,37 +123,38 @@ void CBaseButton::Precache( void )
 
 	switch (m_bLockedSentence)
 	{
-		case 1: m_ls.sLockedSentence = MAKE_STRING("NA"); break; // access denied
-		case 2: m_ls.sLockedSentence = MAKE_STRING("ND"); break; // security lockout
-		case 3: m_ls.sLockedSentence = MAKE_STRING("NF"); break; // blast door
-		case 4: m_ls.sLockedSentence = MAKE_STRING("NFIRE"); break; // fire door
-		case 5: m_ls.sLockedSentence = MAKE_STRING("NCHEM"); break; // chemical door
-		case 6: m_ls.sLockedSentence = MAKE_STRING("NRAD"); break; // radiation door
-		case 7: m_ls.sLockedSentence = MAKE_STRING("NCON"); break; // gen containment
-		case 8: m_ls.sLockedSentence = MAKE_STRING("NH"); break; // maintenance door
-		case 9: m_ls.sLockedSentence = MAKE_STRING("NG"); break; // broken door
-		
-		default: m_ls.sLockedSentence = NULL_STRING; break;
+	case 1: m_ls.sLockedSentence = MAKE_STRING("NA"); break; // access denied
+	case 2: m_ls.sLockedSentence = MAKE_STRING("ND"); break; // security lockout
+	case 3: m_ls.sLockedSentence = MAKE_STRING("NF"); break; // blast door
+	case 4: m_ls.sLockedSentence = MAKE_STRING("NFIRE"); break; // fire door
+	case 5: m_ls.sLockedSentence = MAKE_STRING("NCHEM"); break; // chemical door
+	case 6: m_ls.sLockedSentence = MAKE_STRING("NRAD"); break; // radiation door
+	case 7: m_ls.sLockedSentence = MAKE_STRING("NCON"); break; // gen containment
+	case 8: m_ls.sLockedSentence = MAKE_STRING("NH"); break; // maintenance door
+	case 9: m_ls.sLockedSentence = MAKE_STRING("NG"); break; // broken door
+
+	default: m_ls.sLockedSentence = NULL_STRING; break;
 	}
 
 	switch (m_bUnlockedSentence)
 	{
-		case 1: m_ls.sUnlockedSentence = MAKE_STRING("EA"); break; // access granted
-		case 2: m_ls.sUnlockedSentence = MAKE_STRING("ED"); break; // security door
-		case 3: m_ls.sUnlockedSentence = MAKE_STRING("EF"); break; // blast door
-		case 4: m_ls.sUnlockedSentence = MAKE_STRING("EFIRE"); break; // fire door
-		case 5: m_ls.sUnlockedSentence = MAKE_STRING("ECHEM"); break; // chemical door
-		case 6: m_ls.sUnlockedSentence = MAKE_STRING("ERAD"); break; // radiation door
-		case 7: m_ls.sUnlockedSentence = MAKE_STRING("ECON"); break; // gen containment
-		case 8: m_ls.sUnlockedSentence = MAKE_STRING("EH"); break; // maintenance door
-	
-		default: m_ls.sUnlockedSentence = NULL_STRING; break;
+	case 1: m_ls.sUnlockedSentence = MAKE_STRING("EA"); break; // access granted
+	case 2: m_ls.sUnlockedSentence = MAKE_STRING("ED"); break; // security door
+	case 3: m_ls.sUnlockedSentence = MAKE_STRING("EF"); break; // blast door
+	case 4: m_ls.sUnlockedSentence = MAKE_STRING("EFIRE"); break; // fire door
+	case 5: m_ls.sUnlockedSentence = MAKE_STRING("ECHEM"); break; // chemical door
+	case 6: m_ls.sUnlockedSentence = MAKE_STRING("ERAD"); break; // radiation door
+	case 7: m_ls.sUnlockedSentence = MAKE_STRING("ECON"); break; // gen containment
+	case 8: m_ls.sUnlockedSentence = MAKE_STRING("EH"); break; // maintenance door
+
+	default: m_ls.sUnlockedSentence = NULL_STRING; break;
 	}
 
-	if ( m_sNoise != NULL_STRING )
+	if (m_sNoise != NULL_STRING)
 	{
-		PrecacheScriptSound( STRING( m_sNoise ) );
+		PrecacheScriptSound(STRING(m_sNoise));
 	}
+#endif
 }
 
 
@@ -182,6 +207,12 @@ void CBaseButton::Lock()
 void CBaseButton::Unlock()
 {
 	m_bLocked = false;
+#ifdef MAPBASE
+	if (m_iszUnlockedSound != NULL_STRING)
+	{
+		EmitSound(STRING(m_iszUnlockedSound));
+	}
+#endif
 }
 
 
@@ -228,7 +259,11 @@ void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
 	if (m_bLocked)
 	{
 		// play button locked sound
+	#ifdef MAPBASE
+		EmitSound(STRING(m_iszLockedSound));
+	#else
 		PlayLockSounds(this, &m_ls, TRUE, TRUE);
+	#endif
 		return;
 	}
 
@@ -238,9 +273,33 @@ void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
 	if ( ( ( eCode == BUTTON_PRESS ) && ( m_toggle_state == TS_AT_TOP ) ) ||
 		 ( ( eCode == BUTTON_RETURN ) && ( m_toggle_state == TS_AT_TOP || m_toggle_state == TS_GOING_UP ) ) )
 	{
-		if ( m_sNoise != NULL_STRING )
+
+//	This section of the code appears to be possibly redundant.
+//		
+//	#ifdef MAPBASE
+//		if (m_iszPressedSound != NULL_STRING)
+//		{
+//			EmitSound(STRING(m_iszPressedSound));
+//		}
+//	#else
+//		if (m_sNoise != NULL_STRING)
+//		{
+//			CPASAttenuationFilter filter(this);
+//
+//			EmitSound_t ep;
+//			ep.m_nChannel = CHAN_VOICE;
+//			ep.m_pSoundName = (char*)STRING(m_sNoise);
+//			ep.m_flVolume = 1;
+//			ep.m_SoundLevel = SNDLVL_NORM;
+//
+//			EmitSound(filter, entindex(), ep);
+//		}
+//	#endif
+
+	#ifndef MAPBASE
+		if (m_sNoise != NULL_STRING)
 		{
-			CPASAttenuationFilter filter( this );
+			CPASAttenuationFilter filter(this);
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_VOICE;
@@ -248,8 +307,9 @@ void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			EmitSound(filter, entindex(), ep);
 		}
+	#endif
 
 		m_OnPressed.FireOutput(pActivator, this);
 		ButtonReturn();
@@ -329,9 +389,15 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( code == BUTTON_RETURN )
 	{
-		if ( m_sNoise != NULL_STRING )
+	#ifdef MAPBASE
+		if (m_iszPressedSound != NULL_STRING)
 		{
-			CPASAttenuationFilter filter( this );
+			EmitSound(STRING(m_iszPressedSound));
+		}
+	#else
+		if (m_sNoise != NULL_STRING)
+		{
+			CPASAttenuationFilter filter(this);
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_VOICE;
@@ -339,8 +405,9 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			EmitSound(filter, entindex(), ep);
 		}
+	#endif
 
 		m_OnPressed.FireOutput(m_hActivator, this);
 		ButtonReturn();
@@ -362,15 +429,27 @@ void CBaseButton::Spawn( )
 	//determine sounds for buttons
 	//a sound of 0 should not make a sound
 	//----------------------------------------------------
-	if ( m_sounds )
+#ifndef MAPBASE
+	if (m_sounds)
 	{
-		m_sNoise = MakeButtonSound( m_sounds );
+		m_sNoise = MakeButtonSound(m_sounds);
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
 	else
 	{
 		m_sNoise = NULL_STRING;
 	}
+#else
+	if (m_sounds)
+	{
+		m_sNoise = NULL_STRING;
+	}
+	else
+	{
+		m_sNoise = NULL_STRING;
+	}
+#endif 
+
 
 	Precache();
 
@@ -380,12 +459,21 @@ void CBaseButton::Spawn( )
 		SetNextThink( gpGlobals->curtime + 0.5f );// no hurry, make sure everything else spawns
 	}
 
+#ifdef MAPBASE
+	if (HasSpawnFlags(SF_BUTTON_NOTSOLID))
+	{
+		SetSolid(SOLID_NONE);
+	}
+#endif
+
 	// Convert movedir from angles to a vector
 	QAngle angMoveDir = QAngle( m_vecMoveDir.x, m_vecMoveDir.y, m_vecMoveDir.z );
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
 	SetMoveType( MOVETYPE_PUSH );
+#ifndef MAPBASE
 	SetSolid( SOLID_BSP );
+#endif
 	SetModel( STRING( GetModelName() ) );
 	
 	if (m_flSpeed == 0)
@@ -494,7 +582,11 @@ void CBaseButton::ButtonSpark ( void )
 //-----------------------------------------------------------------------------
 bool CBaseButton::OnUseLocked( CBaseEntity *pActivator )
 {
+#ifdef MAPBASE
+	EmitSound(STRING(m_iszLockedSound));
+#else
 	PlayLockSounds(this, &m_ls, TRUE, TRUE);
+#endif
 
 	if ( gpGlobals->curtime > m_flUseLockedTime )
 	{
@@ -537,6 +629,11 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 		//
 		if ( HasSpawnFlags(SF_BUTTON_TOGGLE))
 		{
+		#ifdef MAPBASE
+			if (m_iszPressedSound != NULL_STRING) {
+				EmitSound(STRING(m_iszPressedSound));
+			}
+		#else
 			if ( m_sNoise != NULL_STRING )
 			{
 				CPASAttenuationFilter filter( this );
@@ -549,7 +646,7 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 				EmitSound( filter, entindex(), ep );
 			}
-
+		#endif
 			m_OnPressed.FireOutput(m_hActivator, this);
 			ButtonReturn();
 		}
@@ -611,7 +708,11 @@ void CBaseButton::ButtonTouch( CBaseEntity *pOther )
 	if (!UTIL_IsMasterTriggered(m_sMaster, pOther) || m_bLocked)
 	{
 		// play button locked sound
+	#ifdef MAPBASE
+		EmitSound(STRING(m_iszLockedSound));
+	#else
 		PlayLockSounds(this, &m_ls, TRUE, TRUE);
+	#endif
 		return;
 	}
 
@@ -640,7 +741,7 @@ void CBaseButton::ButtonTouch( CBaseEntity *pOther )
 	{
 		// code == BUTTON_ACTIVATE
 		m_OnPressed.FireOutput(m_hActivator, this);
-		ButtonActivate( );
+		ButtonActivate();
 	}
 }
 
@@ -651,9 +752,15 @@ void CBaseButton::ButtonTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CBaseButton::ButtonActivate( void )
 {
-	if ( m_sNoise != NULL_STRING )
+	#ifdef MAPBASE
+	if (m_iszPressedSound != NULL_STRING)
 	{
-		CPASAttenuationFilter filter( this );
+		EmitSound(STRING(m_iszPressedSound));
+	}
+	#else
+	if (m_sNoise != NULL_STRING)
+	{
+		CPASAttenuationFilter filter(this);
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_VOICE;
@@ -661,19 +768,35 @@ void CBaseButton::ButtonActivate( void )
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
-	}
+		EmitSound(filter, entindex(), ep);
+	#endif
+
 	
 	if (!UTIL_IsMasterTriggered(m_sMaster, m_hActivator) || m_bLocked)
 	{
 		// button is locked, play locked sound
+	#ifdef MAPBASE
+		if (m_iszLockedSound != NULL_STRING)
+		{
+			EmitSound(STRING(m_iszLockedSound));
+		}
+	#else
 		PlayLockSounds(this, &m_ls, TRUE, TRUE);
+	#endif
+
 		return;
 	}
 	else
 	{
 		// button is unlocked, play unlocked sound
+	#ifdef MAPBASE
+		if (m_iszUnlockedSound != NULL_STRING)
+		{
+			EmitSound(STRING(m_iszUnlockedSound));
+		}
+	#else
 		PlayLockSounds(this, &m_ls, FALSE, TRUE);
+	#endif
 	}
 
 	ASSERT(m_toggle_state == TS_AT_BOTTOM);
@@ -837,15 +960,15 @@ int CBaseButton::DrawDebugTextOverlays()
 LINK_ENTITY_TO_CLASS( func_rot_button, CRotButton );
 
 
-void CRotButton::Spawn( void )
+void CRotButton::Spawn(void)
 {
 	//----------------------------------------------------
 	//determine sounds for buttons
 	//a sound of 0 should not make a sound
 	//----------------------------------------------------
-	if ( m_sounds )
+	if (m_sounds)
 	{
-		m_sNoise = MakeButtonSound( m_sounds );
+;		m_sNoise = MakeButtonSound(m_sounds);
 		PrecacheScriptSound(m_sNoise.ToCStr());
 	}
 	else

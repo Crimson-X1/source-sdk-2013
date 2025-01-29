@@ -36,6 +36,8 @@ $Project
 		$File	"c_movie_display.h"
 		$File	"vgui_movie_display.cpp"
 		$File	"convarproxy.cpp"
+
+		$File	"episodic\c_weapon_hopwire.cpp"
 	
 		$Folder	"Mapbase"
 		{

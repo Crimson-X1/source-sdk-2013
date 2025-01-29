@@ -339,6 +339,13 @@ public:
 	bool IsDissolving() { return ( (GetFlags() & FL_DISSOLVING) != 0 ); }
 	void TransferDissolveFrom( CBaseAnimating *pAnim );
 
+#ifdef CRIMSON_MOD // #ifdef EZ
+	virtual bool	IsDisplacementImpossible() { return m_bDisplacementImpossible; }
+	virtual void	SetDisplacementImpossible( bool displacementImpossible ) { m_bDisplacementImpossible = displacementImpossible; }
+
+	void	InputSetDisplacementImpossible( inputdata_t &inputdata ) { SetDisplacementImpossible( inputdata.value.Bool() ); }
+#endif
+
 	// animation needs
 	float				m_flGroundSpeed;	// computed linear movement rate for current sequence
 	float				m_flLastEventCheck;	// cycle index of when events were last checked
@@ -433,6 +440,12 @@ private:
 	bool				m_bSequenceLoops;	// true if the sequence loops
 	bool				m_bResetSequenceInfoOnLoad; // true if a ResetSequenceInfo was queued up during dynamic load
 	float				m_flDissolveStartTime;
+
+#ifdef CRIMSON_MOD //#ifdef EZ
+	bool				m_bDisplacementImpossible;
+
+	COutputEvent		m_OnConsumed;
+#endif
 
 	// was pev->frame
 	CNetworkVar( float, m_flCycle );

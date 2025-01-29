@@ -363,6 +363,15 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	shader ## _Dynamic_Index _vshIndex; \
 	int vsh ## shader = 0
 
+// psh ## shader is used here to generate a warning if you don't ever call SET_DYNAMIC_PIXEL_SHADER
+#define DECLARE_DYNAMIC_PIXEL_SHADER_SCELL( shader ) \
+	shader ## _Dynamic_Index _pshIndex( pShaderAPI ); \
+	constexpr int psh ## shader = 1
+
+// vsh ## shader is used here to generate a warning if you don't ever call SET_DYNAMIC_VERTEX_SHADER
+#define DECLARE_DYNAMIC_VERTEX_SHADER_SCELL( shader ) \
+	shader ## _Dynamic_Index _vshIndex( pShaderAPI ); \
+	constexpr int vsh ## shader = 1
 
 // psh ## shader is used here to generate a warning if you don't ever call SET_STATIC_PIXEL_SHADER
 #define DECLARE_STATIC_PIXEL_SHADER( shader ) \
@@ -378,6 +387,15 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	shader ## _Static_Index _vshIndex; \
 	int vsh ## shader = 0
 
+// psh ## shader is used here to generate a warning if you don't ever call SET_STATIC_PIXEL_SHADER
+#define DECLARE_STATIC_PIXEL_SHADER_SCELL( shader ) \
+	shader ## _Static_Index _pshIndex( pShaderShadow, params ); \
+	constexpr int psh ## shader = 1
+
+// vsh ## shader is used here to generate a warning if you don't ever call SET_STATIC_VERTEX_SHADER
+#define DECLARE_STATIC_VERTEX_SHADER_SCELL( shader ) \
+	shader ## _Static_Index _vshIndex( pShaderShadow, params ); \
+	constexpr int vsh ## shader = 1
 
 // psh_forgot_to_set_dynamic_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
@@ -388,6 +406,13 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	_pshIndex.Set ## var( ( val ) );  if(g_shaderConfigDumpEnable){printf("\n   PS dyn  var %s = %d (%s)", #var, (int) val, #val );}; \
 	int psh_forgot_to_set_dynamic_ ## var = 0
 
+// psh_forgot_to_set_dynamic_ ## var is used to make sure that you set all
+// all combos.  If you don't, you will get an undefined variable used error 
+// in the SET_DYNAMIC_PIXEL_SHADER block.
+#define SET_DYNAMIC_PIXEL_SHADER_COMBO_SCELL( var, val ) \
+	_pshIndex.Set ## var( ( val ) ); \
+	constexpr int psh_forgot_to_set_dynamic_ ## var = 1
+
 // vsh_forgot_to_set_dynamic_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
 // in the SET_DYNAMIC_VERTEX_SHADER block.
@@ -397,6 +422,19 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	_vshIndex.Set ## var( ( val ) );  if(g_shaderConfigDumpEnable){printf("\n   VS dyn  var %s = %d (%s)", #var, (int) val, #val );}; \
 	int vsh_forgot_to_set_dynamic_ ## var = 0
 
+// vsh_forgot_to_set_dynamic_ ## var is used to make sure that you set all
+// all combos.  If you don't, you will get an undefined variable used error 
+// in the SET_DYNAMIC_VERTEX_SHADER block.
+#define SET_DYNAMIC_VERTEX_SHADER_COMBO_SCELL( var, val ) \
+	_vshIndex.Set ## var( ( val ) ); \
+	constexpr int vsh_forgot_to_set_dynamic_ ## var = 1
+
+// psh_forgot_to_set_static_ ## var is used to make sure that you set all
+// all combos.  If you don't, you will get an undefined variable used error 
+// in the SET_STATIC_PIXEL_SHADER block.
+#define SET_STATIC_PIXEL_SHADER_COMBO_SCELL( var, val ) \
+	_pshIndex.Set ## var( ( val ) ); \
+	constexpr int psh_forgot_to_set_static_ ## var = 1
 
 // psh_forgot_to_set_static_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
@@ -407,6 +445,13 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	_pshIndex.Set ## var( ( val ) ); if(g_shaderConfigDumpEnable){printf("\n   PS stat var %s = %d (%s)", #var, (int) val, #val );}; \
 	int psh_forgot_to_set_static_ ## var = 0
 
+// psh_forgot_to_set_static_ ## var is used to make sure that you set all
+// all combos.  If you don't, you will get an undefined variable used error 
+// in the SET_STATIC_PIXEL_SHADER block.
+#define SET_STATIC_PIXEL_SHADER_COMBO_SCELL( var, val ) \
+	_pshIndex.Set ## var( ( val ) ); \
+	constexpr int psh_forgot_to_set_static_ ## var = 1
+
 // vsh_forgot_to_set_static_ ## var is used to make sure that you set all
 // all combos.  If you don't, you will get an undefined variable used error 
 // in the SET_STATIC_VERTEX_SHADER block.
@@ -416,6 +461,12 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	_vshIndex.Set ## var( ( val ) ); if(g_shaderConfigDumpEnable){printf("\n   VS stat var %s = %d (%s)", #var, (int) val, #val );}; \
 	int vsh_forgot_to_set_static_ ## var = 0
 
+// vsh_forgot_to_set_static_ ## var is used to make sure that you set all
+// all combos.  If you don't, you will get an undefined variable used error 
+// in the SET_STATIC_VERTEX_SHADER block.
+#define SET_STATIC_VERTEX_SHADER_COMBO_SCELL( var, val ) \
+	_vshIndex.Set ## var( ( val ) ); \
+	constexpr int vsh_forgot_to_set_static_ ## var = 1
 
 // psh_testAllCombos adds up all of the psh_forgot_to_set_dynamic_ ## var's from 
 // SET_DYNAMIC_PIXEL_SHADER_COMBO so that an error is generated if they aren't set.
@@ -428,6 +479,16 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int psh_testAllCombos = shaderDynamicTest_ ## shader; \
 	psh_testAllCombos = psh_testAllCombos; \
 	psh ## shader = psh ## shader; \
+	pShaderAPI->SetPixelShaderIndex( _pshIndex.GetIndex() )
+
+// psh_testAllCombos adds up all of the psh_forgot_to_set_dynamic_ ## var's from 
+// SET_DYNAMIC_PIXEL_SHADER_COMBO so that an error is generated if they aren't set.
+// psh_testAllCombos is set to itself to avoid an unused variable warning.
+// psh ## shader being set to itself ensures that DECLARE_DYNAMIC_PIXEL_SHADER 
+// was called for this particular shader.
+#define SET_DYNAMIC_PIXEL_SHADER_SCELL( shader ) \
+	static_assert( ( shaderDynamicTest_ ## shader ) != 0, "Missing combo!" ); \
+	static_assert( psh ## shader != 0, "Not pixel shader!" ); \
 	pShaderAPI->SetPixelShaderIndex( _pshIndex.GetIndex() )
 
 #define SET_DYNAMIC_PIXEL_SHADER_CMD( cmdstream, shader ) \
@@ -450,6 +511,16 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int vsh_testAllCombos = shaderDynamicTest_ ## shader; \
 	vsh_testAllCombos = vsh_testAllCombos; \
 	vsh ## shader = vsh ## shader; \
+	pShaderAPI->SetVertexShaderIndex( _vshIndex.GetIndex() )
+
+// vsh_testAllCombos adds up all of the vsh_forgot_to_set_dynamic_ ## var's from 
+// SET_DYNAMIC_VERTEX_SHADER_COMBO so that an error is generated if they aren't set.
+// vsh_testAllCombos is set to itself to avoid an unused variable warning.
+// vsh ## shader being set to itself ensures that DECLARE_DYNAMIC_VERTEX_SHADER 
+// was called for this particular shader.
+#define SET_DYNAMIC_VERTEX_SHADER_SCELL( shader ) \
+	static_assert( ( shaderDynamicTest_ ## shader ) != 0, "Missing combo!" ); \
+	static_assert( vsh ## shader != 0, "Not vertex shader!" ); \
 	pShaderAPI->SetVertexShaderIndex( _vshIndex.GetIndex() )
 
 #define SET_DYNAMIC_VERTEX_SHADER_CMD( cmdstream, shader ) \
@@ -485,6 +556,26 @@ inline bool CShader_IsFlag2Set( IMaterialVar **params, MaterialVarFlags2_t _flag
 	int vsh_testAllCombos = shaderStaticTest_ ## shader; \
 	vsh_testAllCombos = vsh_testAllCombos; \
 	vsh ## shader = vsh ## shader; \
+	pShaderShadow->SetVertexShader( #shader, _vshIndex.GetIndex() )
+
+// psh_testAllCombos adds up all of the psh_forgot_to_set_static_ ## var's from 
+// SET_STATIC_PIXEL_SHADER_COMBO so that an error is generated if they aren't set.
+// psh_testAllCombos is set to itself to avoid an unused variable warning.
+// psh ## shader being set to itself ensures that DECLARE_STATIC_PIXEL_SHADER 
+// was called for this particular shader.
+#define SET_STATIC_PIXEL_SHADER_SCELL( shader ) \
+	static_assert( ( shaderStaticTest_ ## shader ) != 0, "Missing combo!" ); \
+	static_assert( psh ## shader != 0, "Not pixel shader!" ); \
+	pShaderShadow->SetPixelShader( #shader, _pshIndex.GetIndex() )
+
+// vsh_testAllCombos adds up all of the vsh_forgot_to_set_static_ ## var's from 
+// SET_STATIC_VERTEX_SHADER_COMBO so that an error is generated if they aren't set.
+// vsh_testAllCombos is set to itself to avoid an unused variable warning.
+// vsh ## shader being set to itself ensures that DECLARE_STATIC_VERTEX_SHADER 
+// was called for this particular shader.
+#define SET_STATIC_VERTEX_SHADER_SCELL( shader ) \
+	static_assert( shaderStaticTest_ ## shader != 0, "Missing combo!" ); \
+	static_assert( vsh ## shader != 0, "Not vertex shader!" ); \
 	pShaderShadow->SetVertexShader( #shader, _vshIndex.GetIndex() )
 
 #endif // CSHADER_H

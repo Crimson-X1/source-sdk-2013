@@ -92,6 +92,10 @@ $Project
 			
 			$File	"mapbase\logic_eventlistener.cpp"
 			$File	"mapbase\logic_register_activator.cpp"
+
+			$File	"episodic\grenade_hopwire.cpp"
+			$File	"episodic\grenade_hopwire.h"
+			$File	"episodic\weapon_hopwire.cpp"
 		}
 		
 		$Folder "HL2 DLL"

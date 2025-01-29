@@ -14,6 +14,7 @@
 #include "baseanimating.h"
 #include "physics_prop_ragdoll.h"
 #include "ai_basenpc.h"
+#include "engine/ienginesound.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -106,6 +107,10 @@ void CEntityDissolve::Precache()
 	{
 		PrecacheModel( STRING( GetModelName() ) );
 	}
+
+	PrecacheScriptSound("Dissolve.AR2");
+	PrecacheScriptSound("Dissolve.Electro");
+	PrecacheScriptSound("Dissolve.Core");
 }
 
 
@@ -259,10 +264,12 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 	if ( (nDissolveType == ENTITY_DISSOLVE_ELECTRICAL) || (nDissolveType == ENTITY_DISSOLVE_ELECTRICAL_LIGHT) )
 	{
 		pTarget->DispatchResponse( "TLK_ELECTROCUTESCREAM" );
+		pTarget->EmitSound("Dissolve.Electro");
 	}
 	else
 	{
 		pTarget->DispatchResponse( "TLK_DISSOLVESCREAM" );
+		pTarget->EmitSound("Dissolve.AR2");
 	}
 	return pDissolve;
 }

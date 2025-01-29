@@ -675,6 +675,10 @@ void CViewRender::SetUpViews()
 	bool bCalcViewModelView = false;
 	Vector ViewModelOrigin;
 	QAngle ViewModelAngles;
+	
+#ifdef CSS_WEAPONS_IN_HL2 // This code originates from Mapbase v7.0. In the event of a merge conflict, it should take precedence over this code.
+	view.fovViewmodel = g_pClientMode->GetViewModelFOV();
+#endif
 
 #ifdef MAPBASE
 	view.fovViewmodel = g_pClientMode->GetViewModelFOV();
