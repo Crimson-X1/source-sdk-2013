@@ -4,6 +4,9 @@
 //
 //==================================================================================================
 
+//  STATIC: "WVT"                       "0..1"
+//  STATIC: "LIGHTMAPPED"               "0..1"
+
 //  DYNAMIC: "COMPRESSED_VERTS"         "0..1"
 //  DYNAMIC: "DOWATERFOG"               "0..1"
 //  DYNAMIC: "SKINNING"                 "0..1"
@@ -23,12 +26,17 @@ struct VS_INPUT
 {
     // This is all of the stuff that we ever use
     float4 vPos                     : POSITION;
-    float4 vBoneWeights             : BLENDWEIGHT;
-    float4 vBoneIndices             : BLENDINDICES;
+	float4 vBoneWeights             : BLENDWEIGHT;
+	float4 vBoneIndices             : BLENDINDICES;
     float4 vNormal                  : NORMAL;
     float2 vTexCoord0               : TEXCOORD0;
+#if LIGHTMAPPED
     float4 vLightmapTexCoord        : TEXCOORD1;
     float4 vLightmapTexCoordOffset  : TEXCOORD2;
+#endif
+#if WVT
+    float4 vColor                   : COLOR0;
+#endif
 };
 
 struct VS_OUTPUT
@@ -36,7 +44,6 @@ struct VS_OUTPUT
     // Stuff that isn't seen by the pixel shader
     float4 projPosSetup             : POSITION;
     float  fog                      : FOG;
-    // Stuff that is seen by the pixel shader
     float2 baseTexCoord             : TEXCOORD0;
     float4 lightAtten               : TEXCOORD1;
     float3 worldNormal              : TEXCOORD2;
@@ -44,6 +51,9 @@ struct VS_OUTPUT
     float3 projPos                  : TEXCOORD4;
     float4 lightmapTexCoord1And2    : TEXCOORD5;
     float4 lightmapTexCoord3        : TEXCOORD6;
+#if WVT
+    float blend                     : COLOR0;
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -53,6 +63,7 @@ VS_OUTPUT main( const VS_INPUT v )
 {
     VS_OUTPUT o = ( VS_OUTPUT )0;
 
+#if LIGHTMAPPED
     o.lightmapTexCoord3.z = dot(v.vTexCoord0, cBaseTexCoordTransform[0]) + cBaseTexCoordTransform[0].w;
     o.lightmapTexCoord3.w = dot(v.vTexCoord0, cBaseTexCoordTransform[1]) + cBaseTexCoordTransform[1].w;
     o.lightmapTexCoord1And2.xy = v.vLightmapTexCoord + v.vLightmapTexCoordOffset;
@@ -65,20 +76,28 @@ VS_OUTPUT main( const VS_INPUT v )
     o.lightmapTexCoord1And2.z = lightmapTexCoord2.y;
 
     o.lightmapTexCoord3.xy = lightmapTexCoord3;
+#else
+    o.lightmapTexCoord1And2 = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    o.lightmapTexCoord3 = float4(0.0f, 0.0f, 0.0f, 0.0f);
+#endif
 
     float3 vNormal;
     DecompressVertex_Normal(v.vNormal, vNormal);
 
     float3 worldNormal, worldPos;
+#if SKINNING
     SkinPositionAndNormal(g_bSkinning, v.vPos, vNormal, v.vBoneWeights, v.vBoneIndices, worldPos, worldNormal);
+#else
+    worldPos = mul4x3( v.vPos, cModel[0] );
+    worldNormal = mul3x3( vNormal, ( const float3x3 )cModel[0] );
+#endif
 
     // Transform into projection space
     float4 vProjPos = mul(float4(worldPos, 1), cViewProj);
     o.projPosSetup = vProjPos;
-    vProjPos.z = dot(float4(worldPos, 1), cViewProjZ);
 
     o.projPos = vProjPos.xyz;
-    o.fog = CalcFog(worldPos, vProjPos.xyz, g_FogType);
+    o.fog = CalcFixedFunctionFog(worldPos, g_FogType);
 
     // Needed for water fog alpha and diffuse lighting 
     o.worldPos = worldPos;
@@ -88,19 +107,23 @@ VS_OUTPUT main( const VS_INPUT v )
     o.lightAtten = float4(0, 0, 0, 0);
 
     #if (NUM_LIGHTS > 0)
-        o.lightAtten.x = GetVertexAttenForLight(worldPos, 0, false);
+        o.lightAtten.x = GetVertexAttenForLight(worldPos, 0);
     #endif
 
     #if (NUM_LIGHTS > 1)
-        o.lightAtten.y = GetVertexAttenForLight(worldPos, 1, false);
+        o.lightAtten.y = GetVertexAttenForLight(worldPos, 1);
     #endif
 
     #if (NUM_LIGHTS > 2)
-        o.lightAtten.z = GetVertexAttenForLight(worldPos, 2, false);
+        o.lightAtten.z = GetVertexAttenForLight(worldPos, 2);
     #endif
 
     #if (NUM_LIGHTS > 3)
-        o.lightAtten.w = GetVertexAttenForLight(worldPos, 3, false);
+        o.lightAtten.w = GetVertexAttenForLight(worldPos, 3);
+    #endif
+
+    #if WVT
+        o.blend = v.vColor.a;
     #endif
 
     // Base texture coordinate transform
