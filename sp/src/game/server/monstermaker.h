@@ -181,4 +181,31 @@ protected:
 	ThreeStateDist_t	m_CriterionDistance;
 };
 
+#ifdef CRIMSON_MOD
+class CNPCWarpBall : public CBaseNPCMaker
+{
+public:
+	DECLARE_CLASS(CNPCWarpBall, CBaseNPCMaker);
+
+	CNPCWarpBall(void);
+
+	void Precache(void);
+
+	virtual void MakeNPC(void);
+
+	DECLARE_DATADESC();
+
+	string_t m_iszNPCClassname;			// classname of the NPC(s) that will be created.
+	string_t m_SquadName;
+	string_t m_strHintGroup;
+	string_t m_spawnEquipment;
+	string_t m_RelationshipString;		// Used to load up relationship keyvalues
+	string_t m_ChildTargetName;
+
+	string_t m_iszSpawnEffectName;
+	string_t m_iszSpawnSound;
+};
+#endif // CRIMSON_MOD
+
+
 #endif // MONSTERMAKER_H

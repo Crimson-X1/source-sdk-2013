@@ -320,17 +320,18 @@ void CMovieDisplayScreen::OnTick()
 //-----------------------------------------------------------------------------
 void CMovieDisplayScreen::CalculatePlaybackDimensions( int nSrcWidth, int nSrcHeight )
 {
-	float flFrameRatio = ( (float) GetWide() / (float) GetTall() );
-	float flVideoRatio = ( (float) nSrcWidth / (float) nSrcHeight );
+#ifndef CRIMSON_MOD
+	float flFrameRatio = ((float)GetWide() / (float)GetTall());
+	float flVideoRatio = ((float)nSrcWidth / (float)nSrcHeight);
 
-	if ( flVideoRatio > flFrameRatio )
+	if (flVideoRatio > flFrameRatio)
 	{
 		m_nPlaybackWidth = GetWide();
-		m_nPlaybackHeight = ( GetWide() / flVideoRatio );
+		m_nPlaybackHeight = (GetWide() / flVideoRatio);
 	}
-	else if ( flVideoRatio < flFrameRatio )
+	else if (flVideoRatio < flFrameRatio)
 	{
-		m_nPlaybackWidth = ( GetTall() * flVideoRatio );
+		m_nPlaybackWidth = (GetTall() * flVideoRatio);
 		m_nPlaybackHeight = GetTall();
 	}
 	else
@@ -338,6 +339,15 @@ void CMovieDisplayScreen::CalculatePlaybackDimensions( int nSrcWidth, int nSrcHe
 		m_nPlaybackWidth = GetWide();
 		m_nPlaybackHeight = GetTall();
 	}
+#else
+	float flFrameRatio = ((float)GetWide() / (float)GetTall());
+	float flVideoRatio = ((float)nSrcWidth / (float)nSrcHeight);
+
+	m_nPlaybackWidth = GetWide();
+	m_nPlaybackHeight = GetTall();
+
+#endif // !CRIMSON_MOD
+
 }
 
 //-----------------------------------------------------------------------------

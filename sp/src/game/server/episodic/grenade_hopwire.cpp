@@ -943,7 +943,8 @@ void CGravityVortexController::PullPlayersInRange( void )
 		{
 #ifdef MAPBASE
 //			color32 green = { 32, 252, 0, 255 };
-			color32 green = { 0, 208, 255, 255 };
+//			color32 green = { 0, 208, 255, 255 };
+			color32 green = { 0, 0, 0, 255 };
 			UTIL_ScreenFade( pPlayer, green, 0.1f, 0.0f, (FFADE_OUT|FFADE_STAYOUT) );
 #else
 			color32 black = { 0, 0, 0, 255 };

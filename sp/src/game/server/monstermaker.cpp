@@ -18,6 +18,12 @@
 #include "IEffects.h"
 #include "props.h"
 
+#ifdef CRIMSON_MOD
+#include "engine/IEngineSound.h"
+#include "dlight.h"
+#include "particle_parse.h"
+#endif // CRIMSON_MOD
+
 #include "point_template.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1093,3 +1099,148 @@ void CTemplateNPCMaker::InputSetMinimumSpawnDistance( inputdata_t &inputdata )
 {
 	m_iMinSpawnDistance = inputdata.value.Int();
 }
+
+
+#ifdef CRIMSON_MOD
+//-----------------------------------------------------------------------------
+// Purpose: Identical to npc_maker, except it emits a particle system and sound
+// effect when it spawns an npc. Unsure if to add DLights and possibly energy beams?
+//-----------------------------------------------------------------------------
+LINK_ENTITY_TO_CLASS(env_warpball, CNPCWarpBall);
+
+BEGIN_DATADESC(CNPCWarpBall)
+
+DEFINE_KEYFIELD(m_iszNPCClassname, FIELD_STRING, "NPCType"),
+DEFINE_KEYFIELD(m_ChildTargetName, FIELD_STRING, "NPCTargetname"),
+DEFINE_KEYFIELD(m_SquadName, FIELD_STRING, "NPCSquadName"),
+DEFINE_KEYFIELD(m_spawnEquipment, FIELD_STRING, "additionalequipment"),
+DEFINE_KEYFIELD(m_strHintGroup, FIELD_STRING, "NPCHintGroup"),
+DEFINE_KEYFIELD(m_RelationshipString, FIELD_STRING, "Relationship"),
+DEFINE_KEYFIELD(m_iszSpawnEffectName, FIELD_STRING, "ParticleEffect"),
+DEFINE_KEYFIELD(m_iszSpawnSound, FIELD_STRING, "SpawnSound"),
+
+END_DATADESC()
+
+
+//-----------------------------------------------------------------------------
+// Constructor
+//-----------------------------------------------------------------------------
+CNPCWarpBall::CNPCWarpBall(void)
+{
+	m_spawnEquipment = NULL_STRING;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Precache the target NPC
+//-----------------------------------------------------------------------------
+void CNPCWarpBall::Precache(void)
+{
+	BaseClass::Precache();
+	
+	if (m_iszSpawnEffectName != NULL_STRING) 
+	{
+		PrecacheParticleSystem(STRING(m_iszSpawnEffectName));
+	}
+		
+	if (m_iszSpawnSound != NULL_STRING)
+	{
+		PrecacheScriptSound(STRING(m_iszSpawnSound));
+	}
+
+	const char* pszNPCName = STRING(m_iszNPCClassname);
+	if (!pszNPCName || !pszNPCName[0])
+	{
+		Warning("npc_maker %s has no specified NPC-to-spawn classname.\n", STRING(GetEntityName()));
+	}
+	else
+	{
+		UTIL_PrecacheOther(pszNPCName);
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Creates the NPC.
+//-----------------------------------------------------------------------------
+void CNPCWarpBall::MakeNPC(void)
+{
+	if (!CanMakeNPC())
+		return;
+
+	CAI_BaseNPC* pent = (CAI_BaseNPC*)CreateEntityByName(STRING(m_iszNPCClassname));
+
+	if (!pent)
+	{
+		Warning("NULL Ent in NPCMaker!\n");
+		return;
+	}
+
+	// ------------------------------------------------
+	//  Intialize spawned NPC's relationships
+	// ------------------------------------------------
+	pent->SetRelationshipString(m_RelationshipString);
+
+	m_OnSpawnNPC.Set(pent, pent, this);
+
+	pent->SetAbsOrigin(GetAbsOrigin());
+
+	// Strip pitch and roll from the spawner's angles. Pass only yaw to the spawned NPC.
+	QAngle angles = GetAbsAngles();
+	angles.x = 0.0;
+	angles.z = 0.0;
+	pent->SetAbsAngles(angles);
+
+	//pent->AddSpawnFlags(SF_NPC_FALL_TO_GROUND);
+
+	if (m_spawnflags & SF_NPCMAKER_FADE)
+	{
+		pent->AddSpawnFlags(SF_NPC_FADE_CORPSE);
+	}
+
+	pent->m_spawnEquipment = m_spawnEquipment;
+	pent->SetSquadName(m_SquadName);
+	pent->SetHintGroup(m_strHintGroup);
+
+	ChildPreSpawn(pent);
+
+	if (m_iszSpawnSound != NULL_STRING)
+		pent->EmitSound(STRING(m_iszSpawnSound));
+
+	if (m_iszSpawnEffectName != NULL_STRING) {
+		DispatchParticleEffect(STRING(m_iszSpawnEffectName), pent->GetAbsOrigin(), pent->GetAbsAngles(), pent);
+	}
+	
+	SetNextThink(gpGlobals->curtime + 0.2f);
+	
+	DispatchSpawn(pent);
+
+	pent->SetOwnerEntity(this);
+	DispatchActivate(pent);
+
+	if (m_ChildTargetName != NULL_STRING)
+	{
+		// if I have a netname (overloaded), give the child NPC that name as a targetname
+		pent->SetName(m_ChildTargetName);
+	}
+
+	ChildPostSpawn(pent);
+
+	m_nLiveChildren++;// count this NPC
+
+	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	{
+		m_nMaxNumNPCs--;
+
+		if (IsDepleted())
+		{
+			m_OnAllSpawned.FireOutput(this, this);
+
+			// Disable this forever.  Don't kill it because it still gets death notices
+			SetThink(NULL);
+			SetUse(NULL);
+		}
+	}
+}
+#endif // CRIMSON_MOD
+
