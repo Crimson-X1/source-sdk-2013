@@ -157,6 +157,12 @@ public:
 	bool			OnBeginMoveAndShoot();
 	void			OnEndMoveAndShoot();
 
+#ifdef EZ
+	bool			PickTacticalLookTarget(AILookTargetArgs_t* pArgs);
+	void			OnStateChange(NPC_STATE OldState, NPC_STATE NewState);
+//	void			AimGun();
+#endif
+
 	// Combat
 	WeaponProficiency_t CalcWeaponProficiency( CBaseCombatWeapon *pWeapon );
 	bool			HasShotgun();

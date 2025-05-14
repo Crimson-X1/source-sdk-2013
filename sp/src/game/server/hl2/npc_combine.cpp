@@ -3819,6 +3819,73 @@ void CNPC_Combine::OnEndMoveAndShoot()
 	VacateStrategySlot();
 }
 
+#ifdef EZ
+//-----------------------------------------------------------------------------
+// Blixibon - Soldiers need to be locked onto their enemies or else they end up looking in odd-looking directions.
+//-----------------------------------------------------------------------------
+bool CNPC_Combine::PickTacticalLookTarget(AILookTargetArgs_t* pArgs)
+{
+	if (HasCondition(COND_SEE_ENEMY))
+	{
+		CBaseEntity* pEnemy = GetEnemy();
+		if (pEnemy && ValidHeadTarget(pEnemy->EyePosition()))
+		{
+			// Look at the enemy if possible.
+			pArgs->hTarget = pEnemy;
+			pArgs->flInfluence = random->RandomFloat(0.8, 1.0);
+			pArgs->flRamp = 0;
+		}
+		else
+		{
+			// Look ahead instead. We can't be looking in random directions.
+			Vector vecForward;
+			GetVectors(&vecForward, NULL, NULL);
+
+			pArgs->vTarget = EyePosition() + (vecForward * 16.0f);
+			pArgs->hTarget = NULL;
+			pArgs->flInfluence = random->RandomFloat(0.8, 1.0);
+			pArgs->flRamp = 0;
+		}
+
+		return true;
+	}
+	else
+	{
+		return BaseClass::PickTacticalLookTarget(pArgs);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Blixibon - Hack to kick in the above look target code as soon as we're in combat
+//-----------------------------------------------------------------------------
+void CNPC_Combine::OnStateChange(NPC_STATE OldState, NPC_STATE NewState)
+{
+	BaseClass::OnStateChange(OldState, NewState);
+
+	if (NewState == NPC_STATE_COMBAT)
+	{
+		// Pick a new look target
+		ExpireCurrentRandomLookTarget();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Blixibon - Part of getting Combine soldiers to look at visually interesting hints
+//-----------------------------------------------------------------------------
+//void CNPC_Combine::AimGun()
+//{
+//	BaseClass::AimGun();
+//
+	// CNPC_PlayerCompanion's AimGun() handling makes this safe.
+//	if (!GetEnemy() && GetAimTarget())
+//	{
+		// There's probably a better way to do this I'm missing, but this allows soldiers to face their aim targets.
+		// This has 0.75 importance so other facing calls take priority.
+//		AddFacingTarget(GetAimTarget(), 0.75f, 0.75f);
+//	}
+//}
+#endif
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 WeaponProficiency_t CNPC_Combine::CalcWeaponProficiency( CBaseCombatWeapon *pWeapon )
