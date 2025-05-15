@@ -1,23 +1,56 @@
-default:  fxctmp9_tmp\pbr_vs20b.inc shaders\fxc\pbr_vs20b.vcs fxctmp9_tmp\pbr_ps20b.inc shaders\fxc\pbr_ps20b.vcs
+default:  fxctmp9_tmp\flowmappedwater_vs20.inc shaders\fxc\flowmappedwater_vs20.vcs fxctmp9_tmp\flowmappedwater_ps20.inc shaders\fxc\flowmappedwater_ps20.vcs fxctmp9_tmp\flowmappedwater_ps20b.inc shaders\fxc\flowmappedwater_ps20b.vcs fxctmp9_tmp\flowmappedWaterCheap_ps20.inc shaders\fxc\flowmappedWaterCheap_ps20.vcs fxctmp9_tmp\flowmappedWaterCheap_ps20b.inc shaders\fxc\flowmappedWaterCheap_ps20b.vcs
 
-fxctmp9_tmp\pbr_vs20b.inc shaders\fxc\pbr_vs20b.vcs: pbr_vs20b.fxc common_pragmas.h common_fxc.h common_vs_fxc.h common_hlsl_cpp_consts.h
-	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." pbr_vs20b.fxc-----pbr_vs20b
-	echo pbr_vs20b.fxc>> filestocopy.txt
+fxctmp9_tmp\flowmappedwater_vs20.inc shaders\fxc\flowmappedwater_vs20.vcs: flowmappedwater_vs20.fxc common_vs_fxc.h common_pragmas.h common_fxc.h common_hlsl_cpp_consts.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." flowmappedwater_vs20.fxc-----flowmappedwater_vs20
+	echo flowmappedwater_vs20.fxc>> filestocopy.txt
+	echo common_vs_fxc.h>> filestocopy.txt
 	echo common_pragmas.h>> filestocopy.txt
 	echo common_fxc.h>> filestocopy.txt
-	echo common_vs_fxc.h>> filestocopy.txt
 	echo common_hlsl_cpp_consts.h>> filestocopy.txt
 
-fxctmp9_tmp\pbr_ps20b.inc shaders\fxc\pbr_ps20b.vcs: pbr_ps20b.fxc common_vertexlitgeneric_dx9.h common_hlsl_cpp_consts.h common_lightmappedgeneric_fxc.h common_fxc.h common_flashlight_fxc.h common_pragmas.h shader_constant_register_map.h pbr_common_ps2_3_x.h common_ps_fxc.h
-	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." pbr_ps20b.fxc-----pbr_ps20b
-	echo pbr_ps20b.fxc>> filestocopy.txt
-	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+fxctmp9_tmp\flowmappedwater_ps20.inc shaders\fxc\flowmappedwater_ps20.vcs: flowmappedwater_ps2x.fxc shader_constant_register_map.h common_hlsl_cpp_consts.h common_flashlight_fxc.h common_pragmas.h common_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx9.h common_fog_ps_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." flowmappedwater_ps2x.fxc-----flowmappedwater_ps20
+	echo flowmappedwater_ps2x.fxc>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
 	echo common_hlsl_cpp_consts.h>> filestocopy.txt
-	echo common_lightmappedgeneric_fxc.h>> filestocopy.txt
-	echo common_fxc.h>> filestocopy.txt
 	echo common_flashlight_fxc.h>> filestocopy.txt
 	echo common_pragmas.h>> filestocopy.txt
-	echo shader_constant_register_map.h>> filestocopy.txt
-	echo pbr_common_ps2_3_x.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
 	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\flowmappedwater_ps20b.inc shaders\fxc\flowmappedwater_ps20b.vcs: flowmappedwater_ps2x.fxc shader_constant_register_map.h common_hlsl_cpp_consts.h common_flashlight_fxc.h common_pragmas.h common_fxc.h common_ps_fxc.h common_vertexlitgeneric_dx9.h common_fog_ps_fxc.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." flowmappedwater_ps2x.fxc-----flowmappedwater_ps20b
+	echo flowmappedwater_ps2x.fxc>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo common_flashlight_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+
+fxctmp9_tmp\flowmappedWaterCheap_ps20.inc shaders\fxc\flowmappedWaterCheap_ps20.vcs: flowmappedWaterCheap_ps2x.fxc common_hlsl_cpp_consts.h shader_constant_register_map.h common_fog_ps_fxc.h common_vertexlitgeneric_dx9.h common_ps_fxc.h common_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." flowmappedWaterCheap_ps2x.fxc-----flowmappedWaterCheap_ps20
+	echo flowmappedWaterCheap_ps2x.fxc>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
+
+fxctmp9_tmp\flowmappedWaterCheap_ps20b.inc shaders\fxc\flowmappedWaterCheap_ps20b.vcs: flowmappedWaterCheap_ps2x.fxc common_hlsl_cpp_consts.h shader_constant_register_map.h common_fog_ps_fxc.h common_vertexlitgeneric_dx9.h common_ps_fxc.h common_fxc.h common_pragmas.h
+	perl ..\..\devtools\bin\fxc_prep.pl   -source "..\.." flowmappedWaterCheap_ps2x.fxc-----flowmappedWaterCheap_ps20b
+	echo flowmappedWaterCheap_ps2x.fxc>> filestocopy.txt
+	echo common_hlsl_cpp_consts.h>> filestocopy.txt
+	echo shader_constant_register_map.h>> filestocopy.txt
+	echo common_fog_ps_fxc.h>> filestocopy.txt
+	echo common_vertexlitgeneric_dx9.h>> filestocopy.txt
+	echo common_ps_fxc.h>> filestocopy.txt
+	echo common_fxc.h>> filestocopy.txt
+	echo common_pragmas.h>> filestocopy.txt
 

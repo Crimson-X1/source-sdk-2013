@@ -15,7 +15,11 @@ $Project "Shaders (Episodic)"
 		$File	"common_vertexlitgeneric_dx9.h"
 		$File	"common_lightmappedgeneric_fxc.h"
 		$File	"common_flashlight_fxc.h"
-		$File	"pbr_common_ps2_3_x.h"
+		$File	"common_fog_ps_fxc.h"
+		$File	"common_fog_ps_supportsvertexfog_fxc.h"
+		$File	"common_fog_vs_fxc.h"
+		$File	"common_ps_fxc.h"
+		
 	}
 
 	$Folder "Shader Source"
@@ -25,7 +29,11 @@ $Project "Shaders (Episodic)"
 			$File	"pbr_ps30.fxc"
 			$File	"pbr_vs30.fxc"
 			$File	"pbr_ps20b.fxc"
-			$File	"pbr_vs20b.fxc"		
+			$File	"pbr_vs20b.fxc"
+			$File	"flowmappedwater_ps2x.fxc"
+			$File	"flowmappedWater_vs20.fxc"
+			$File	"flowmappedWaterCheap_ps2x.fxc"
+			$File	"flowmappedWaterCheap_vs20.fxc"				
 		}
 
 		$File	"mymod_dx9_30.txt"
@@ -35,5 +43,6 @@ $Project "Shaders (Episodic)"
 	$Folder "Source Files"
 	{
 		$File	"pbr_dx9.cpp"
+		$File	"flowmappedwater.cpp"
 	}
 }
