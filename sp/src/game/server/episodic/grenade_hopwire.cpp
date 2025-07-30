@@ -14,7 +14,7 @@
 #include "explode.h"
 #include "physics_prop_ragdoll.h"
 #include "movevars_shared.h"
-#ifdef MAPBASE // EZ2
+#ifdef CRIMSON_MOD // EZ2
 #include "ai_basenpc.h"
 #include "npc_barnacle.h"
 //#include "ez2/npc_basepredator.h"
@@ -42,18 +42,18 @@ ConVar hopwire_strider_kill_dist_h( "hopwire_strider_kill_dist_h", "300" );
 ConVar hopwire_strider_kill_dist_v( "hopwire_strider_kill_dist_v", "256" );
 ConVar hopwire_strider_hits( "hopwire_strider_hits", "1" );
 ConVar hopwire_trap("hopwire_trap", "0");
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 ConVar hopwire_hopheight( "hopwire_hopheight", "400" );
 #endif
 
 ConVar hopwire_minheight("hopwire_minheight", "175");
 ConVar hopwire_radius("hopwire_radius", "300");
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 ConVar hopwire_strength( "hopwire_strength", "150" );
 #endif
 ConVar hopwire_duration("hopwire_duration", "3.0");
 ConVar hopwire_pull_player("hopwire_pull_player", "1");
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 ConVar hopwire_strength( "hopwire_strength", "256" );
 ConVar hopwire_hopheight( "hopwire_hopheight", "200" );
 ConVar hopwire_ragdoll_radius( "hopwire_ragdoll_radius", "96" );
@@ -109,7 +109,7 @@ extern void CreateConcussiveBlast(const Vector &origin, const Vector &surfaceNor
 #define	MAX_HOP_HEIGHT		(hopwire_hopheight.GetFloat())		// Maximum amount the grenade will "hop" upwards when detonated
 #define	MIN_HOP_HEIGHT		(hopwire_minheight.GetFloat())		// Minimum amount the grenade will "hop" upwards when detonated
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 // Xen Grenade Interactions
 int	g_interactionXenGrenadePull			= 0;
 int	g_interactionXenGrenadeConsume		= 0;
@@ -142,7 +142,7 @@ template<class ... Args> void XenGrenadeDebugMsg( const char *szMsg, Args ... ar
 static const char *g_SpawnThinkContext = "SpawnThink";
 #endif
 static const char *g_SchlorpThinkContext = "SchlorpThink";
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 //-----------------------------------------------------------------------------
 // Purpose: Ensures Xen recipes are loaded and precached when they are needed.
 //-----------------------------------------------------------------------------
@@ -695,7 +695,7 @@ float CGravityVortexController::GetConsumedMass( void ) const
 //-----------------------------------------------------------------------------
 void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 {
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	// Make sure we can consume this entity
 	if (!CanConsumeEntity(pEnt))
 		return;
@@ -726,7 +726,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 		return;
 #endif
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	float flMass = 0.0f;
 
 	pEnt->FireNamedOutput( "OnConsumed", variant_t(), this, pEnt );
@@ -783,7 +783,7 @@ void CGravityVortexController::ConsumeEntity( CBaseEntity *pEnt )
 		// If the NPC is to be remvoed, fire the output
 		pEnt->FireNamedOutput( "OnDeath", variant_t(), this, pEnt );
 	}
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 	// Add this to our lists
 	if (hopwire_spawn_life.GetInt() == 1)
 	{
@@ -932,7 +932,7 @@ void CGravityVortexController::PullPlayersInRange( void )
 	if ( dist < 128.0f )
 	{
 		// Kill the player (with falling death sound and effects)
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 		CTakeDamageInfo deathInfo( this, this, GetAbsOrigin(), GetAbsOrigin(), 200, DMG_FALL );
 #else
 		CTakeDamageInfo deathInfo( this, this, GetAbsOrigin(), GetAbsOrigin(), 5, DMG_FALL );
@@ -941,10 +941,10 @@ void CGravityVortexController::PullPlayersInRange( void )
 		
 		if ( pPlayer->IsAlive() == false )
 		{
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 //			color32 green = { 32, 252, 0, 255 };
-//			color32 green = { 0, 208, 255, 255 };
-			color32 green = { 0, 0, 0, 255 };
+			color32 green = { 0, 208, 255, 255 };
+//			color32 green = { 0, 0, 0, 255 };
 			UTIL_ScreenFade( pPlayer, green, 0.1f, 0.0f, (FFADE_OUT|FFADE_STAYOUT) );
 #else
 			color32 black = { 0, 0, 0, 255 };
@@ -958,7 +958,7 @@ void CGravityVortexController::PullPlayersInRange( void )
 	if ( dist > m_flRadius )
 		return;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	// Don't pull unless convar set
 	if ( !hopwire_pull_player.GetBool() )
 		return;
@@ -971,7 +971,7 @@ void CGravityVortexController::PullPlayersInRange( void )
 	float mass = pPlayer->VPhysicsGetObject()->GetMass();
 	float playerForce = m_flStrength * 0.05f;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	if (m_flPullFadeTime > 0.0f)
 	{
 		playerForce *= ((gpGlobals->curtime - m_flStartTime) / m_flPullFadeTime);
@@ -1018,7 +1018,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 
 		// Become ragdoll
 		CTakeDamageInfo info( this, this, 1.0f, DMG_GENERIC );
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 		// Don't infinitely generate ragdolls of entities we can't kill
 		if ( !pVictim->PassesDamageFilter( info ) )
 		{
@@ -1075,7 +1075,7 @@ void CGravityVortexController::CreateDenseBall( void )
 	}
 }
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 bool VectorLessFunc( const Vector &lhs, const Vector &rhs )
 {
 	return lhs.LengthSqr() < rhs.LengthSqr();
@@ -1102,7 +1102,7 @@ int	CGravityVortexController::Restore( IRestore &restore )
 	return BaseClass::Restore( restore );
 }
 
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 //-----------------------------------------------------------------------------
 // Purpose: Creates a xen lifeform with a mass equal to the aggregate mass consumed by the vortex
 //-----------------------------------------------------------------------------
@@ -1836,7 +1836,7 @@ void CGravityVortexController::PullThink( void )
 {
 	float flStrength = m_flStrength;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	// Pull any players close enough to us
 	PullPlayersInRange();
 
@@ -1905,7 +1905,7 @@ void CGravityVortexController::PullThink( void )
 
 		IPhysicsObject *pPhysObject = NULL;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 		// Don't consume entities already in the process of being removed.
 		// NPCs which generate ragdolls might not be removed in time, so check for EF_NODRAW as well.
 		if ( pEnts[i]->IsMarkedForDeletion() || pEnts[i]->IsEffectActive(EF_NODRAW) )
@@ -2040,7 +2040,7 @@ void CGravityVortexController::PullThink( void )
 		vecForce *= MAX( 1.0f - ( abs( dist2D ) / m_flRadius ), 0.1f ) * flStrength * mass;
 		
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 		CTakeDamageInfo info( this, this, vecForce, GetAbsOrigin(), flStrength, DMG_BLAST );
 		if ( !pEnts[i]->DispatchInteraction( g_interactionXenGrenadePull, &info, GetThrower() ) && pPhysObject != NULL )
 		{
@@ -2117,17 +2117,20 @@ void CGravityVortexController::PullThink( void )
 		// Aftershock
 		if (hopwire_aftershock_enabled.GetBool() == true)
 		{
-			if (m_flMass >= hopwire_aftershock_mass.GetFloat())
+			if (gpGlobals->curtime > m_flAftershockDelay)
 			{
-				DevMsg("Sufficient mass for aftershock!\n");
-				Vector AftershockVector = Vector(GetAbsAngles().x, GetAbsAngles().y, GetAbsAngles().z);
-				EmitSound("WeaponVortexGrenade.Aftershock");
-				CreateConcussiveBlast(GetAbsOrigin(), AftershockVector, this, 1.5);
-				DispatchParticleEffect("Explosion_Vortex", GetAbsOrigin(), GetAbsAngles(), this);
-			}
-			else
-			{
-				DevMsg("Not enough mass was consumed for an aftershock. Minimum mass required: %.2f kilograms.\n", hopwire_aftershock_mass.GetFloat());
+				if (m_flMass >= hopwire_aftershock_mass.GetFloat())
+				{
+					DevMsg("Sufficient mass for aftershock.\n");
+					Vector AftershockVector = Vector(this->GetAbsAngles().x, this->GetAbsAngles().y, this->GetAbsAngles().z);
+					this->EmitSound("WeaponVortexGrenade.Aftershock");
+					CreateConcussiveBlast(this->GetAbsOrigin(), AftershockVector, this, 1.5);
+					//DispatchParticleEffect("ExplosionVortex", this->GetAbsOrigin(), this->GetAbsAngles());
+				}
+				else
+				{
+					DevMsg("Insufficient mass for aftershock. Required mass: %.2f kilograms.\n", hopwire_aftershock_mass.GetFloat());
+				}
 			}
 		}
 #endif // CRIMSON_MOD
@@ -2146,7 +2149,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 	m_flRadius	= radius;
 	m_flStrength= strength;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	// Play a danger sound throughout the duration of the vortex so that NPCs run away
 	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), radius, duration, this );
 
@@ -2167,7 +2170,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 	SetThink( &CGravityVortexController::PullThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	SetContextThink( &CGravityVortexController::SchlorpThink, gpGlobals->curtime + 0.2f, g_SchlorpThinkContext );
 #endif
 }
@@ -2175,7 +2178,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 //-----------------------------------------------------------------------------
 // Purpose: Creation utility
 //-----------------------------------------------------------------------------
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 CGravityVortexController *CGravityVortexController::Create( const Vector &origin, float radius, float strength, float duration, CBaseEntity *pGrenade )
 #else
 CGravityVortexController *CGravityVortexController::Create( const Vector &origin, float radius, float strength, float duration )
@@ -2186,7 +2189,7 @@ CGravityVortexController *CGravityVortexController::Create( const Vector &origin
 	if ( pVortex == NULL )
 		return NULL;
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	pVortex->SetOwnerEntity( pGrenade );
 	CBaseGrenade * pGrenadeCast = static_cast<CBaseGrenade*>(pGrenade);
 	if (pGrenadeCast)
@@ -2210,7 +2213,7 @@ CGravityVortexController *CGravityVortexController::Create( const Vector &origin
 
 BEGIN_DATADESC( CGravityVortexController )
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	DEFINE_KEYFIELD( m_flMass, FIELD_FLOAT, "mass" ),
 	DEFINE_KEYFIELD( m_flEndTime, FIELD_TIME, "duration" ),
 	DEFINE_KEYFIELD( m_flRadius, FIELD_FLOAT, "radius" ),
@@ -2236,6 +2239,8 @@ BEGIN_DATADESC( CGravityVortexController )
 	DEFINE_FIELD( m_iSuckedProps, FIELD_INTEGER ),
 	DEFINE_FIELD( m_iSuckedNPCs, FIELD_INTEGER ),
 
+	DEFINE_FIELD(m_flAftershockDelay, FIELD_TIME),
+
 	DEFINE_INPUTFUNC( FIELD_VOID, "Detonate", InputDetonate ),
 //	DEFINE_INPUTFUNC( FIELD_EHANDLE, "FakeSpawnEntity", InputFakeSpawnEntity ),
 //	DEFINE_INPUTFUNC( FIELD_VOID, "CreateXenLife", InputCreateXenLife ),
@@ -2250,7 +2255,7 @@ BEGIN_DATADESC( CGravityVortexController )
 #endif
 
 	DEFINE_THINKFUNC( PullThink ),
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 //	DEFINE_THINKFUNC( SpawnThink ),
 	DEFINE_THINKFUNC( SchlorpThink ),
 #endif
@@ -2258,7 +2263,7 @@ END_DATADESC()
 
 LINK_ENTITY_TO_CLASS( vortex_controller, CGravityVortexController );
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 #define GRENADE_MODEL_CLOSED	"models/weapons/w_vortexGrenade.mdl" // was roller.mdl
 #define GRENADE_MODEL_OPEN		"models/weapons/w_vortexGrenade.mdl" // was roller_spikes.mdl
 
@@ -2277,7 +2282,7 @@ static const char *g_SpriteOffContext = "SpriteOff";
 BEGIN_DATADESC( CGrenadeHopwire )
 	DEFINE_FIELD( m_hVortexController, FIELD_EHANDLE ),
 
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	DEFINE_FIELD( m_pMainGlow, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_flNextBlipTime, FIELD_TIME ),
 
@@ -2356,7 +2361,7 @@ bool CGrenadeHopwire::CreateVPhysics()
 //-----------------------------------------------------------------------------
 void CGrenadeHopwire::Precache( void )
 {
-#ifndef MAPBASE
+#ifndef CRIMSON_MOD
 	// FIXME: Replace
 	PrecacheScriptSound("NPC_Strider.Charge");
 	PrecacheScriptSound("NPC_Strider.Shoot");
@@ -2366,7 +2371,7 @@ void CGrenadeHopwire::Precache( void )
 	PrecacheModel( szWorldModelOpen );
 	PrecacheModel( szWorldModelClosed );
 
-#ifndef MAPBASE	
+#ifndef CRIMSON_MOD	
 	PrecacheModel( DENSE_BALL_MODEL );
 #else
 	PrecacheScriptSound( "WeaponVortexGrenade.Explode" );
@@ -2412,7 +2417,7 @@ void CGrenadeHopwire::Precache( void )
 // Purpose: 
 // Input  : timer - 
 //-----------------------------------------------------------------------------
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 void CGrenadeHopwire::SetTimer( float timer )
 {
 	m_flDetonateTime = gpGlobals->curtime + timer;
@@ -2599,7 +2604,7 @@ void CGrenadeHopwire::EndThink( void )
 //-----------------------------------------------------------------------------
 void CGrenadeHopwire::CombatThink( void )
 {
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	if ( VPhysicsGetObject() && VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 	{
 		// Players must stop holding us here
@@ -2626,7 +2631,7 @@ void CGrenadeHopwire::CombatThink( void )
 
 	// Quick screen flash
 	CBasePlayer *pPlayer = ToBasePlayer( GetThrower() );
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	color32 green = { 0, 208, 255, 100 }; // my bits Xen Green - was 255,255,255,255
 	UTIL_ScreenFade( pPlayer, green, 0.2f, 0.0f, FFADE_IN );
 #else
@@ -2637,7 +2642,7 @@ void CGrenadeHopwire::CombatThink( void )
 	// Create the vortex controller to pull entities towards us
 	if ( hopwire_vortex.GetBool() )
 	{
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 		m_hVortexController = CGravityVortexController::Create( GetAbsOrigin(), hopwire_radius.GetFloat(), hopwire_strength.GetFloat(), hopwire_duration.GetFloat(), this );
 #else
 		m_hVortexController = CGravityVortexController::Create( GetAbsOrigin(), hopwire_radius.GetFloat(), hopwire_strength.GetFloat(), hopwire_duration.GetFloat() );
@@ -2678,7 +2683,7 @@ void CGrenadeHopwire::SetVelocity( const Vector &velocity, const AngularImpulse 
 //-----------------------------------------------------------------------------
 void CGrenadeHopwire::Detonate( void )
 {
-#ifdef MAPBASE
+#ifdef CRIMSON_MOD
 	if ( GetThrower() )
 	{
 		// Tell the thrower we're hopping

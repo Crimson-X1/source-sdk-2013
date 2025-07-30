@@ -17,6 +17,10 @@
 #include "te_particlesystem.h"
 #include "ndebugoverlay.h"
 
+#ifdef CRIMSON_MOD
+#include "particle_parse.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -103,6 +107,7 @@ public:
 	float	m_flRadius = 256;
 	float	m_flMagnitude = 1.0;
 	string_t	m_iszSoundName;
+	string_t	m_iszParticleEffect;
 #endif
 
 	CConcussiveBlast( void ) {}
@@ -118,6 +123,14 @@ public:
 #ifdef MAPBASE
 		if (m_iszSoundName != NULL_STRING)
 			PrecacheScriptSound(STRING(m_iszSoundName));
+#endif
+
+#ifdef CRIMSON_MOD
+		//if (m_iszParticleEffect != NULL_STRING)
+		//{
+		//	PrecacheParticleSystem(STRING(m_iszParticleEffect));
+		//}
+		PrecacheParticleSystem("ExplosionVortex");
 #endif
 
 		BaseClass::Precache();
@@ -178,6 +191,11 @@ public:
 #ifdef MAPBASE
 		if (m_iszSoundName != NULL_STRING)
 			EmitSound(STRING(m_iszSoundName));
+
+		//if (m_iszParticleEffect != NULL_STRING) {
+		//	DispatchParticleEffect(STRING(m_iszParticleEffect), WorldSpaceCenter(), GetAbsAngles(), this);
+		//}
+		DispatchParticleEffect("ExplosionVortex", GetAbsOrigin(), GetAbsAngles(), this);
 
 		if (!HasSpawnFlags(SF_CONCUSSIVEBLAST_REPEATABLE))
 #endif

@@ -1119,6 +1119,8 @@ DEFINE_KEYFIELD(m_RelationshipString, FIELD_STRING, "Relationship"),
 DEFINE_KEYFIELD(m_iszSpawnEffectName, FIELD_STRING, "ParticleEffect"),
 DEFINE_KEYFIELD(m_iszSpawnSound, FIELD_STRING, "SpawnSound"),
 
+DEFINE_FIELD(m_flDelayTime, FIELD_TIME)
+
 END_DATADESC()
 
 
@@ -1204,41 +1206,43 @@ void CNPCWarpBall::MakeNPC(void)
 
 	ChildPreSpawn(pent);
 
-	if (m_iszSpawnSound != NULL_STRING)
+	if (m_iszSpawnSound != NULL_STRING) {
 		pent->EmitSound(STRING(m_iszSpawnSound));
-
-	if (m_iszSpawnEffectName != NULL_STRING) {
-		DispatchParticleEffect(STRING(m_iszSpawnEffectName), pent->GetAbsOrigin(), pent->GetAbsAngles(), pent);
-	}
-	
-	SetNextThink(gpGlobals->curtime + 0.2f);
-	
-	DispatchSpawn(pent);
-
-	pent->SetOwnerEntity(this);
-	DispatchActivate(pent);
-
-	if (m_ChildTargetName != NULL_STRING)
-	{
-		// if I have a netname (overloaded), give the child NPC that name as a targetname
-		pent->SetName(m_ChildTargetName);
 	}
 
-	ChildPostSpawn(pent);
-
-	m_nLiveChildren++;// count this NPC
-
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (gpGlobals->curtime > m_flDelayTime)
 	{
-		m_nMaxNumNPCs--;
+		DispatchSpawn(pent);
 
-		if (IsDepleted())
+		pent->SetOwnerEntity(this);
+		DispatchActivate(pent);
+
+		if (m_iszSpawnEffectName != NULL_STRING) {
+			DispatchParticleEffect(STRING(m_iszSpawnEffectName), pent->GetAbsOrigin(), pent->GetAbsAngles(), pent);
+		}
+
+		if (m_ChildTargetName != NULL_STRING)
 		{
-			m_OnAllSpawned.FireOutput(this, this);
+			// if I have a netname (overloaded), give the child NPC that name as a targetname
+			pent->SetName(m_ChildTargetName);
+		}
 
-			// Disable this forever.  Don't kill it because it still gets death notices
-			SetThink(NULL);
-			SetUse(NULL);
+		ChildPostSpawn(pent);
+
+		m_nLiveChildren++;// count this NPC
+
+		if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+		{
+			m_nMaxNumNPCs--;
+
+			if (IsDepleted())
+			{
+				m_OnAllSpawned.FireOutput(this, this);
+
+				// Disable this forever.  Don't kill it because it still gets death notices
+				SetThink(NULL);
+				SetUse(NULL);
+			}
 		}
 	}
 }

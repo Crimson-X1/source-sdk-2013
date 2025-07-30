@@ -204,6 +204,8 @@ public:
 
 	string_t m_iszSpawnEffectName;
 	string_t m_iszSpawnSound;
+
+	float	m_flDelayTime;
 };
 #endif // CRIMSON_MOD
 

@@ -371,12 +371,12 @@ void CWeaponAR2::SecondaryAttack( void )
 	{
 		SendWeaponAnim( ACT_VM_DRYFIRE );
 		BaseClass::WeaponSound( EMPTY );
-		m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f;
+		m_flNextSecondaryAttack = gpGlobals->curtime + 0.5f; // 0.5
 		return;
 	}
 
 	m_bShotDelayed = true;
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flDelayedFire = gpGlobals->curtime + 0.5f;
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flDelayedFire = gpGlobals->curtime + 0.79f; // 0.5
 
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
 	if( pPlayer )

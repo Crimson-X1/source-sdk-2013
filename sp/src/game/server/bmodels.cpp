@@ -453,6 +453,7 @@ protected:
 #ifdef MAPBASE
 	int		m_iMinPitch = 30; // FANPITCHMIN
 	int		m_iMaxPitch = 100; // FANPITCHMAX
+	COutputEvent m_OnMaxSpeed;
 #endif
 
 public:
@@ -499,6 +500,12 @@ BEGIN_DATADESC( CFuncRotating )
 	DEFINE_INPUTFUNC( FIELD_VOID, "StartForward", InputStartForward ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "StartBackward", InputStartBackward ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "StopAtStartPos", InputStopAtStartPos ),
+
+#ifdef MAPBASE
+	// Outputs
+	DEFINE_OUTPUT(m_OnMaxSpeed, "OnMaxSpeed")
+#endif
+
 
 END_DATADESC()
 
@@ -974,7 +981,11 @@ void CFuncRotating::UpdateSpeed( float flNewSpeed )
 		// Changing speed - adjust the pitch and volume.
 		RampPitchVol();
 	}
-
+#ifdef MAPBASE
+	if (m_flSpeed == m_flMaxSpeed) {
+		m_OnMaxSpeed.FireOutput(this, this);
+	}
+#endif
 	SetLocalAngularVelocity( m_vecMoveAng * m_flSpeed );
 }
 
