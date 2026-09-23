@@ -1500,8 +1500,10 @@ void UTIL_EmitSoundSuit(edict_t *entity, const char *sample)
 	int pitch = PITCH_NORM;
 
 	fvol = suitvolume.GetFloat();
+#ifndef CRIMSON_MOD
 	if (random->RandomInt(0,1))
 		pitch = random->RandomInt(0,6) + 98;
+#endif
 
 	// If friendlies are talking, reduce the volume of the suit
 	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( GetContainingEntity( entity ) ) )

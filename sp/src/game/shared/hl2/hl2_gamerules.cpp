@@ -386,7 +386,13 @@ ConVar	sk_dmg_sniper_penetrate_npc( "sk_dmg_sniper_penetrate_npc","0", FCVAR_REP
 ConVar	sk_plr_dmg_airboat		( "sk_plr_dmg_airboat", "0", FCVAR_REPLICATED );
 ConVar	sk_npc_dmg_airboat		( "sk_npc_dmg_airboat", "0", FCVAR_REPLICATED );
 
-ConVar	sk_max_gauss_round		( "sk_max_gauss_round", "0", FCVAR_REPLICATED );
+#ifdef CRIMSON_MOD
+ConVar	sk_plr_dmg_gauss("sk_plr_dmg_gauss", "25", FCVAR_REPLICATED);
+ConVar	sk_plr_max_dmg_gauss("sk_plr_max_dmg_gauss", "125", FCVAR_REPLICATED);
+ConVar	sk_max_uranium("sk_max_uranium", "100", FCVAR_REPLICATED);
+#endif
+
+ConVar	sk_max_gauss_round		( "sk_max_gauss_round", "100", FCVAR_REPLICATED );
 
 // Gunship & Dropship cannons
 ConVar	sk_npc_dmg_gunship			( "sk_npc_dmg_gunship", "0", FCVAR_REPLICATED );
@@ -2218,11 +2224,18 @@ CAmmoDef *GetAmmoDef()
 #else
 		def.AddAmmoType("CombineHeavyCannon", DMG_BULLET, TRACER_LINE, 40, 40, NULL, 10 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED); // hit like a 10 kg weight at 750 ft/s
 #endif
-		def.AddAmmoType("ammo_proto1", DMG_BULLET, TRACER_LINE, 0, 0, 10, 0, 0);
+		//def.AddAmmoType("ammo_proto1", DMG_BULLET, TRACER_LINE, 0, 0, 10, 0, 0);
 #endif // HL2_EPISODIC
 
 #ifdef MAPBASE
 		def.AddAmmoType("slam", DMG_BURN, TRACER_NONE, 0, 0, 5, 0, 0);
+		//def.AddAmmoType("Gauss", DMG_SHOCK, TRACER_NONE, "sk_plr_dmg_gauss", "sk_plr_dmg_gauss", "sk_max_gauss_round", BULLET_IMPULSE(700, 2978), 0); // hit like a 10kg weight at 400 in/s
+#endif
+
+#ifdef CRIMSON_MOD
+		def.AddAmmoType("Uranium", DMG_SHOCK, TRACER_NONE, 0, 0, "sk_max_uranium", BULLET_IMPULSE(700, 2978), 0);
+		//def.AddAmmoType("Uranium", DMG_SHOCK, TRACER_NONE, 0, 0, "sk_max_uranium", BULLET_IMPULSE(700, 2978), 0);
+#endif
 
 #ifdef CSS_WEAPONS_IN_HL2
 		def.AddAmmoType("45ACP", DMG_BULLET, TRACER_LINE_AND_WHIZ, "sk_plr_dmg_45acp", "sk_npc_dmg_45acp", "sk_max_45acp", BULLET_IMPULSE(200, 1225), 0);
@@ -2230,11 +2243,11 @@ CAmmoDef *GetAmmoDef()
 		def.AddAmmoType("556mm", DMG_BULLET, TRACER_LINE_AND_WHIZ, "sk_plr_dmg_556mm", "sk_npc_dmg_556mm", "sk_max_556mm", BULLET_IMPULSE(200, 1225), 0);
 		def.AddAmmoType("762mm", DMG_BULLET, TRACER_LINE_AND_WHIZ, "sk_plr_dmg_762mm", "sk_npc_dmg_762mm", "sk_max_762mm", BULLET_IMPULSE(200, 1225), 0);
 #endif
+		def.AddAmmoType("ammo_proto1", DMG_BULLET, TRACER_LINE, 0, 0, 10, 0, 0);
 	}
 
 	return &def;
 }
 
 #endif 
-#endif
 #endif

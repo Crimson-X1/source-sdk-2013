@@ -220,6 +220,12 @@ public:
 LINK_ENTITY_TO_CLASS( item_healthkit_custom, CHealthKitCustom );
 //PRECACHE_REGISTER(item_healthkit_custom);
 
+//#ifdef CRIMSON_MOD
+// Allows the new values to be in a distinct FGD entry
+//LINK_ENTITY_TO_CLASS(item_healthkit_classic, CHealthKitCustom);
+//LINK_ENTITY_TO_CLASS(item_healthkit_xen, CHealthKitCustom);
+//#endif
+
 #ifdef MAPBASE
 BEGIN_DATADESC( CHealthKitCustom )
 
@@ -244,6 +250,14 @@ CHealthKitCustom::CHealthKitCustom()
 //-----------------------------------------------------------------------------
 void CHealthKitCustom::Spawn( void )
 {
+//#ifdef CRIMSON_MOD
+//	if (FStrEq(GetClassname(), "item_healthkit_classic"))
+//		SetClassname("item_healthkit_custom");
+//	
+//	if (FStrEq(GetClassname(), "item_healthkit_xen"))
+//		SetClassname("item_healthkit_custom");
+//#endif
+	
 	Precache();
 	SetModel( STRING( GetModelName() ) );
 

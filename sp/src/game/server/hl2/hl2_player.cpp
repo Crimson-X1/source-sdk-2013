@@ -130,6 +130,11 @@ ConVar player_process_scene_events( "player_process_scene_events", "1", FCVAR_NO
 #define	FLASH_DRAIN_TIME	 1.1111	// 100 units / 90 secs
 #define	FLASH_CHARGE_TIME	 50.0f	// 100 units / 2 secs
 
+#ifdef CRIMSON_MOD
+#define USE_DI_BATTERY_READOUT
+static const char* PLAYER_CONTEXT_BATTERY_PICKUP = "BatteryPickupContext";
+#endif
+
 
 //==============================================================================================
 // CAPPED PLAYER PHYSICS DAMAGE TABLE
@@ -663,6 +668,9 @@ CHL2_Player::CHL2_Player()
 
 #ifdef HL2MP
 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 25.0f );				// 100 units in 4 seconds
+#endif
+#ifdef CRIMSON_MOD	
+	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 6.666 );				// 100 units in 15 seconds
 #else
 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 12.5f );				// 100 units in 8 seconds
 #endif
@@ -672,7 +680,11 @@ CHL2_Player::CHL2_Player()
 #else
 	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 2.222 );	// 100 units in 45 second
 #endif
-CSuitPowerDevice SuitDeviceBreather( bits_SUIT_DEVICE_BREATHER, 6.7f );		// 100 units in 15 seconds (plus three padded seconds)
+#ifdef CRIMSON_MOD
+	CSuitPowerDevice SuitDeviceBreather( bits_SUIT_DEVICE_BREATHER, 1.666);		// 100 units in 60 seconds
+#else
+	CSuitPowerDevice SuitDeviceBreather(bits_SUIT_DEVICE_BREATHER, 6.7f);		// 100 units in 15 seconds (plus three padded seconds)
+#endif
 
 #ifdef MAPBASE
 // Default: 100 units in 8 seconds
@@ -2579,10 +2591,12 @@ bool CHL2_Player::SuitPower_ShouldRecharge( void )
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-ConVar	sk_battery( "sk_battery","0" );			
+//-----------------------------------------------------------------------------		
+//ConVar	sk_battery( "sk_battery","0" );			
 
-bool CHL2_Player::ApplyBattery( float powerMultiplier )
+
+#ifndef USE_DI_BATTERY_READOUT
+bool CHL2_Player::ApplyBattery(float powerMultiplier)
 {
 	const float MAX_NORMAL_BATTERY = 100;
 	if ((ArmorValue() < MAX_NORMAL_BATTERY) && IsSuitEquipped())
@@ -2590,34 +2604,196 @@ bool CHL2_Player::ApplyBattery( float powerMultiplier )
 		int pct;
 		char szcharge[64];
 
-		IncrementArmorValue( sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY );
+		IncrementArmorValue(sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY);
 
-		CPASAttenuationFilter filter( this, "ItemBattery.Touch" );
-		EmitSound( filter, entindex(), "ItemBattery.Touch" );
+		CPASAttenuationFilter filter(this, "ItemBattery.Touch");
+		EmitSound(filter, entindex(), "ItemBattery.Touch");
 
-		CSingleUserRecipientFilter user( this );
+		CSingleUserRecipientFilter user(this);
 		user.MakeReliable();
 
-		UserMessageBegin( user, "ItemPickup" );
-			WRITE_STRING( "item_battery" );
+		UserMessageBegin(user, "ItemPickup");
+		WRITE_STRING("item_battery");
 		MessageEnd();
 
-		
+
 		// Suit reports new power level
 		// For some reason this wasn't working in release build -- round it.
-		pct = (int)( (float)(ArmorValue() * 100.0) * (1.0/MAX_NORMAL_BATTERY) + 0.5);
+		pct = (int)((float)(ArmorValue() * 100.0) * (1.0 / MAX_NORMAL_BATTERY) + 0.5);
+#ifndef CRIMSON_MOD
 		pct = (pct / 5);
+#endif
 		if (pct > 0)
 			pct--;
-	
-		Q_snprintf( szcharge,sizeof(szcharge),"!HEV_%1dP", pct );
-		
+
+		Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
 		//UTIL_EmitSoundSuit(edict(), szcharge);
-		//SetSuitUpdate(szcharge, FALSE, SUIT_NEXT_IN_30SEC);
-		return true;		
+#ifdef CRIMSON_MOD		
+		SetSuitUpdate(szcharge, FALSE, 10); // SUIT_NEXT_IN_30SEC
+#endif		
+		return true;
 	}
 	return false;
 }
+#endif 
+
+#ifdef USE_DI_BATTERY_READOUT // DARKINTERVAL
+//-----------------------------------------------------------------------------
+// This monitors battery level and lets the suit comment the precise level
+//-----------------------------------------------------------------------------
+void CHL2_Player::ContextThink_BatteryPickup()
+{
+	if (m_flLastBatteryTime < 0)
+		SetContextThink(NULL, 0, PLAYER_CONTEXT_BATTERY_PICKUP);
+
+	if (gpGlobals->curtime >= m_flLastBatteryTime + 0.5f && m_flLastBatteryTime > 0)
+	{
+		const float MAX_NORMAL_BATTERY = 100;
+		int pct;
+		char szcharge[64];
+
+		// Suit reports new power level, without rounding the value
+		int currentSuitLevel = min(200, ArmorValue()); // 200 is possible w/ Citadel chargers 
+		pct = (int)((float)(ArmorValue() * 100.0) * (1.0 / MAX_NORMAL_BATTERY) + 0.5);
+		//if (pct < 9)
+		//	pct = 0;
+		if (pct > 0)
+			pct--;
+
+		if (currentSuitLevel <= 100 && MAX_NORMAL_BATTERY == 100)
+		{
+			Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
+			SetSuitUpdate(szcharge, FALSE, 10);
+		}
+		else
+		{
+			Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
+			SetSuitUpdate(szcharge, FALSE, 10);
+		}
+
+		m_flLastBatteryTime = -1.0f;
+	}
+
+	SetContextThink(&CHL2_Player::ContextThink_BatteryPickup, gpGlobals->curtime + 0.1f, PLAYER_CONTEXT_BATTERY_PICKUP);
+}
+#endif // CRIMSON_MOD // DARKINTERVAL
+ConVar	sk_battery("sk_battery", "0");
+#ifdef CRIMSON_MOD // DARKINTERVAL
+bool CHL2_Player::ApplyBattery(float powerMultiplier, bool bSilent, bool bFromBattery)
+#else
+bool CHL2_Player::ApplyBattery(float powerMultiplier)
+#endif
+{
+	const float MAX_NORMAL_BATTERY = 100;
+#ifdef CRIMSON_MOD // DARKINTERVAL
+	if (IsSuitEquipped())
+#endif
+	{
+#ifdef CRIMSON_MOD // DARKINTERVAL
+		if ((ArmorValue() < MAX_NORMAL_BATTERY) && IsSuitEquipped())
+		//if (ArmorValue() < MAX_NORMAL_BATTERY)
+#else
+		if ((ArmorValue() < MAX_NORMAL_BATTERY) && IsSuitEquipped())
+#endif
+		{
+#ifdef CRIMSON_MOD // DARKINTERVAL
+			IncrementArmorValue(sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY);
+			//IncrementArmorValue(sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY * 2);
+#else
+			int pct;
+			char szcharge[64];
+			IncrementArmorValue(sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY);
+#endif
+#ifdef CRIMSON_MOD // DARKINTERVAL
+			if (!bSilent)
+#endif
+			{
+				CPASAttenuationFilter filter(this, "ItemBattery.Touch");
+				EmitSound(filter, entindex(), "ItemBattery.Touch");
+
+				CSingleUserRecipientFilter user(this);
+				user.MakeReliable();
+
+				UserMessageBegin(user, "ItemPickup");
+				WRITE_STRING("item_battery");
+				MessageEnd();
+			}
+#ifdef CRIMSON_MOD // DARKINTERVAL
+			/* // moved in ContextThink_BatteryPickup above
+			if (!m_bSuitCommentsDisabled)
+			{
+				// Suit reports new power level, without rounding the value
+				pct = (int)((float)(ArmorValue() * 100.0) * (1.0 / MAX_NORMAL_BATTERY) + 1.0);
+				if (pct < 9)
+					pct = 0;
+				if (pct > 0)
+					pct--;
+
+				Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
+				SetSuitUpdate(szcharge, FALSE, 10);
+			}
+			*/
+
+			if (!m_bSuitCommentsDisabled)
+			{
+				m_flLastBatteryTime = gpGlobals->curtime;
+				SetContextThink(&CHL2_Player::ContextThink_BatteryPickup, gpGlobals->curtime + 0.1f, PLAYER_CONTEXT_BATTERY_PICKUP);
+			}
+
+			return true; // tells the battery to remove itself
+#else
+			// Suit reports new power level
+			// For some reason this wasn't working in release build -- round it.
+			pct = (int)((float)(ArmorValue() * 100.0) * (1.0 / MAX_NORMAL_BATTERY) + 0.5);
+			pct = (pct / 5);
+			if (pct > 0)
+				pct--;
+
+			Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
+			//UTIL_EmitSoundSuit(edict(), szcharge);
+			//SetSuitUpdate(szcharge, FALSE, SUIT_NEXT_IN_30SEC);
+			return true;
+#endif // DARKINTERVAL
+		}
+#ifdef CRIMSON_MOD // DARKINTERVAL
+		else
+		{
+			// Charge is at 100, but we still want to process the event to speak the line.
+			// Unless we're trying to touch a battery. Don't make the suit speak in this case.
+
+			if (!m_bSuitCommentsDisabled && !bFromBattery)
+			{
+				m_flLastBatteryTime = gpGlobals->curtime;
+				SetContextThink(&CHL2_Player::ContextThink_BatteryPickup, gpGlobals->curtime + 0.1f, PLAYER_CONTEXT_BATTERY_PICKUP);
+
+			}
+			/* // moved in ContextThink_BatteryPickup above
+			if (!m_bSuitCommentsDisabled && !bFromBattery)
+			{
+				// Suit reports new power level, without rounding the value
+				pct = (int)((float)(ArmorValue() * 100.0) * (1.0 / MAX_NORMAL_BATTERY) + 1.0);
+				if (pct < 9)
+					pct = 0;
+				if (pct > 0)
+					pct--;
+
+				Q_snprintf(szcharge, sizeof(szcharge), "!HEV_%1dP", pct);
+
+				SetSuitUpdate(szcharge, FALSE, 10);
+			}
+			*/
+			return false; // don't remove the battery.
+		}
+#endif // DARKINTERVAL
+	}
+	return false; // don't remove the battery.
+}
+
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

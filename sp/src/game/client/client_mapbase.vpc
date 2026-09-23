@@ -78,6 +78,8 @@ $Project
 			$File	"mapbase\c_weapon_custom_hl2.cpp"
 			$File	"mapbase\mapbase_autocubemap.cpp"
 			$File	"mapbase\hud_generic_timer.cpp"
+
+			$File	"hl2\c_weapon_gauss.cpp"
 		}
 		
 		$Folder "HL2 DLL"

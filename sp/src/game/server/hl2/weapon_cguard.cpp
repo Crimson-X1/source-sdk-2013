@@ -191,12 +191,14 @@ public:
 #ifdef MAPBASE
 		if (m_iszSoundName != NULL_STRING)
 			EmitSound(STRING(m_iszSoundName));
-
+#endif
+#ifdef CRIMSON_MOD
 		//if (m_iszParticleEffect != NULL_STRING) {
 		//	DispatchParticleEffect(STRING(m_iszParticleEffect), WorldSpaceCenter(), GetAbsAngles(), this);
 		//}
-		DispatchParticleEffect("ExplosionVortex", GetAbsOrigin(), GetAbsAngles(), this);
-
+		DispatchParticleEffect("ExplosionVortex", GetLocalOrigin(), GetLocalAngles(), this);
+#endif
+#ifdef MAPBASE
 		if (!HasSpawnFlags(SF_CONCUSSIVEBLAST_REPEATABLE))
 #endif
 		UTIL_Remove( this );

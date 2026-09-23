@@ -163,6 +163,10 @@ public:
 	// from CBasePlayer
 	virtual void		SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, int pvssize );
 
+#ifdef CRIMSON_MOD	// DARKINTERVAL
+	virtual void		ContextThink_BatteryPickup(void); // monitors battery level and lets the suit comment the precise level
+#endif
+
 	// Suit Power Interface
 	void SuitPower_Update( void );
 	bool SuitPower_Drain( float flPower ); // consume some of the suit's power.
@@ -183,8 +187,11 @@ public:
 #endif
 
 	// Apply a battery
+#ifdef CRIMSON_MOD
+	bool ApplyBattery(float powerMultiplier = 1.0, bool bSilent = false, bool bFromBattery = true);
+#else
 	bool ApplyBattery( float powerMultiplier = 1.0 );
-
+#endif
 	// Commander Mode for controller NPCs
 	enum CommanderCommand_t
 	{
@@ -431,6 +438,11 @@ private:
 	float				m_flTargetFindTime;
 
 	EHANDLE				m_hPlayerProxy;
+
+#ifdef CRIMSON_MOD // DARKINTERVAL
+	bool				m_bSuitCommentsDisabled;
+	float				m_flLastBatteryTime;
+#endif
 
 	bool				m_bFlashlightDisabled;
 	bool				m_bUseCappedPhysicsDamageTable;

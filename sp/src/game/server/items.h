@@ -40,10 +40,15 @@
 #define SIZE_AMMO_45ACP_LARGE		60
 #define SIZE_AMMO_357SIG			13
 #define SIZE_AMMO_357SIG_LARGE		39
-#define SIZE_AMMO_556mm			30
+#define SIZE_AMMO_556mm				30
 #define SIZE_AMMO_556mm_LARGE		60
-#define SIZE_AMMO_762mm			30
+#define SIZE_AMMO_762mm				30
 #define SIZE_AMMO_762mm_LARGE		60
+#endif
+
+#ifdef CRIMSON_MOD
+#define SIZE_AMMO_URANIUM			15
+#define SIZE_AMMO_URANIUM_LARGE		35
 #endif
 
 #define SF_ITEM_START_CONSTRAINED	0x00000001

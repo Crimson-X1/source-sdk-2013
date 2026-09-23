@@ -28,7 +28,9 @@ public:
 
 	void	ItemPostFrame( void );
 	void	Precache( void );
-	
+#ifdef CRIMSON_MOD // EZ1
+	void	PrimaryAttack(void); // Breadman
+#endif		
 	void	SecondaryAttack( void );
 	void	DelayedAttack( void );
 

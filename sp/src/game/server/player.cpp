@@ -6557,12 +6557,23 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem( "weapon_ar2" );
 		GiveNamedItem( "weapon_shotgun" );
 		GiveNamedItem( "weapon_physcannon" );
+#ifndef CRIMSON_MOD
 		GiveNamedItem( "weapon_bugbait" );
+#endif
 		GiveNamedItem( "weapon_rpg" );
 		GiveNamedItem( "weapon_357" );
 		GiveNamedItem( "weapon_crossbow" );
 #ifdef HL2_EPISODIC
 		// GiveNamedItem( "weapon_magnade" );
+#endif
+#ifdef CRIMSON_MOD
+		GiveAmmo(25, "Uranium");
+		GiveAmmo(5, "slam");
+		GiveNamedItem("weapon_gauss");
+		//GiveNamedItem("weapon_slam");
+		GiveNamedItem("weapon_hopwire");
+		
+		GiveNamedItem("item_battery");
 #endif
 		if ( GetHealth() < 100 )
 		{

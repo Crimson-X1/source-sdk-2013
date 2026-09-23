@@ -91,6 +91,11 @@ public:
 
 LINK_ENTITY_TO_CLASS( item_battery_custom, CItemBatteryCustom );
 
+#ifdef CRIMSON_MOD
+// Allows the new values to be in a distinct FGD entry
+LINK_ENTITY_TO_CLASS(item_battery_classic, CItemBatteryCustom);
+#endif
+
 #ifdef MAPBASE
 BEGIN_DATADESC( CItemBatteryCustom )
 
@@ -115,6 +120,11 @@ CItemBatteryCustom::CItemBatteryCustom()
 //-----------------------------------------------------------------------------
 void CItemBatteryCustom::Spawn( void )
 {
+#ifdef CRIMSON_MOD
+	if (FStrEq(GetClassname(), "item_battery_classic"))
+		SetClassname("item_battery_custom");
+#endif
+	
 	Precache();
 	SetModel( STRING( GetModelName() ) );
 

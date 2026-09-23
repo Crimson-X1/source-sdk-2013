@@ -292,7 +292,47 @@ void CWeaponAR2::DoImpactEffect( trace_t &tr, int nDamageType )
 
 	BaseClass::DoImpactEffect( tr, nDamageType );
 }
+#ifdef CRIMSON_MOD // EZ1
+//-----------------------------------------------------------------------------
+// Purpose: BREADMAN --- This overrides the primaryfire function to suit the mod - Breadman
+// Input  : &info - 
+//-----------------------------------------------------------------------------
+void CWeaponAR2::PrimaryAttack(void)
+{
+	if (CBasePlayer* pPlayer = ToBasePlayer(GetOwner()))
+	{
+		SendWeaponAnim(GetPrimaryAttackActivity());
+		WeaponSound(SINGLE);
 
+		m_nShotsFired++;
+
+		// Fire the bullets
+		FireBulletsInfo_t info;
+		info.m_iShots = 1;
+		info.m_vecSrc = pPlayer->Weapon_ShootPosition();
+		info.m_vecDirShooting = pPlayer->GetAutoaimVector(AUTOAIM_SCALE_DEFAULT);
+		info.m_vecSpread = pPlayer->GetAttackSpread(this);
+		info.m_flDistance = MAX_TRACE_LENGTH;
+		info.m_iAmmoType = m_iPrimaryAmmoType;
+		info.m_iTracerFreq = 1;
+
+		pPlayer->FireBullets(info);
+		pPlayer->DoMuzzleFlash();
+
+		// Time we wait before allowing to throw another
+		m_flNextPrimaryAttack = gpGlobals->curtime + 0.1f;
+
+		m_iPrimaryAttacks++;
+		gamestats->Event_WeaponFired(pPlayer, false, GetClassname());
+
+		m_iClip1 = m_iClip1 - 1;
+
+		AddViewKick();
+
+		BaseClass::ItemPostFrame();
+	}
+}
+#endif
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -376,7 +416,7 @@ void CWeaponAR2::SecondaryAttack( void )
 	}
 
 	m_bShotDelayed = true;
-	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flDelayedFire = gpGlobals->curtime + 0.79f; // 0.5
+	m_flNextPrimaryAttack = m_flNextSecondaryAttack = m_flDelayedFire = gpGlobals->curtime + 0.795f; // 0.5
 
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );
 	if( pPlayer )
@@ -596,8 +636,14 @@ void CWeaponAR2::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChara
 void CWeaponAR2::AddViewKick( void )
 {
 	#define	EASY_DAMPEN			0.5f
+#ifdef CRIMSON_MOD
+	#define	MAX_VERTICAL_KICK	8.0f	//Degrees - was 9.0
+	#define	SLIDE_LIMIT			5.0f	//Seconds - was 5.0 
+#else
 	#define	MAX_VERTICAL_KICK	8.0f	//Degrees
 	#define	SLIDE_LIMIT			5.0f	//Seconds
+#endif
+
 	
 	//Get the view kick
 	CBasePlayer *pPlayer = ToBasePlayer( GetOwner() );

@@ -1933,6 +1933,9 @@ enum
 	SHELL_SMALL,
 	SHELL_BIG,
 	SHELL_SHOTGUN,
+#ifdef CRIMSON_MOD
+	SHELL_IRIFLE,
+#endif
 };
 
 //-----------------------------------------------------------------------------
@@ -2414,6 +2417,10 @@ void CTempEnts::LevelInit()
 	m_pShells[0] = (model_t *) engine->LoadModel( "models/weapons/shell.mdl" );
 	m_pShells[1] = (model_t *) engine->LoadModel( "models/weapons/rifleshell.mdl" );
 	m_pShells[2] = (model_t *) engine->LoadModel( "models/weapons/shotgun_shell.mdl" );
+#ifdef CRIMSON_MOD
+	m_pShells[3] = (model_t *) engine->LoadModel( "models/weapons/irifle_shell.mdl" );
+#endif
+
 #endif
 
 #if defined( HL1_CLIENT_DLL )
@@ -2452,6 +2459,9 @@ void CTempEnts::Init (void)
 	m_pShells[0] = NULL;
 	m_pShells[1] = NULL;
 	m_pShells[2] = NULL;
+#ifdef CRIMSON_MOD
+	m_pShells[3] = NULL;
+#endif
 
 #if defined( HL1_CLIENT_DLL )
 	m_pHL1Shell			= NULL;
@@ -3334,6 +3344,9 @@ void CTempEnts::HL1EjectBrass( const Vector &vecPosition, const QAngle &angAngle
 #define SHELLTYPE_PISTOL	0
 #define SHELLTYPE_RIFLE		1
 #define SHELLTYPE_SHOTGUN	2
+#ifdef CRIMSON_MOD
+#define SHELLTYPE_IRIFLE	3
+#endif
 
 
 void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVelocity, int nVelocity, int shellType, CBasePlayer *pShooter )

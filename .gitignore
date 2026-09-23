@@ -98,3 +98,5 @@ sp/src/vgui2/*.pdb
 sp/src/devtools/gcc9+support.o
 *.dll
 *.fxc
+*.lnk
+.vs/source-sdk-2013/v17/DocumentLayout.json

@@ -794,6 +794,77 @@ LINK_ENTITY_TO_CLASS( item_css_ammo_762mm, CItem_Box762mmRounds );
 LINK_ENTITY_TO_CLASS( item_css_ammo_762mm_large, CItem_Box762mmRounds );
 #endif
 
+#ifdef CRIMSON_MOD
+// ========================================================================
+//	>> CItem_BoxUranium
+// ========================================================================
+class CItem_BoxUranium : public CItem
+{
+public:
+	DECLARE_CLASS(CItem_BoxUranium, CItem);
+
+	void Precache(void)
+	{
+		PrecacheModel("models/items/ammo_uranium.mdl");
+	}
+	void Spawn(void)
+	{
+		Precache();
+		SetModel("models/items/ammo_uranium.mdl");
+		BaseClass::Spawn();
+	}
+
+	bool MyTouch(CBasePlayer* pPlayer)
+	{
+		if (ITEM_GiveAmmo(pPlayer, SIZE_AMMO_URANIUM, "Uranium"))
+		{
+			if (g_pGameRules->ItemShouldRespawn(this) == GR_ITEM_RESPAWN_NO)
+			{
+				UTIL_Remove(this);
+			}
+			return true;
+		}
+		return false;
+	}
+};
+LINK_ENTITY_TO_CLASS(item_ammo_uranium, CItem_BoxUranium);
+
+
+// ========================================================================
+//	>> CItem_LargeBoxUranium
+// ========================================================================
+class CItem_LargeBoxUranium : public CItem
+{
+public:
+	DECLARE_CLASS(CItem_LargeBoxUranium, CItem);
+
+	void Precache(void)
+	{
+		PrecacheModel("models/items/ammo_uranium_large.mdl");
+	}
+	void Spawn(void)
+	{
+		Precache();
+		SetModel("models/items/ammo_uranium_large.mdl");
+		BaseClass::Spawn();
+	}
+
+	bool MyTouch(CBasePlayer* pPlayer)
+	{
+		if (ITEM_GiveAmmo(pPlayer, SIZE_AMMO_URANIUM_LARGE, "Uranium"))
+		{
+			if (g_pGameRules->ItemShouldRespawn(this) == GR_ITEM_RESPAWN_NO)
+			{
+				UTIL_Remove(this);
+			}
+			return true;
+		}
+		return false;
+	}
+};
+LINK_ENTITY_TO_CLASS(item_ammo_uranium_large, CItem_LargeBoxUranium);
+#endif
+
 // ==================================================================
 // Ammo crate which will supply infinite ammo of the specified type
 // ==================================================================
